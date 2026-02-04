@@ -1,6 +1,9 @@
 import socket
 import json
 
+from shared.schema import validate_event
+from server.storage.events import store_event
+
 HOST = "0.0.0.0"   # Listen on all interfaces
 PORT = 9001       # Arbitrary non-privileged port
 BUFFER_SIZE = 4096
@@ -27,11 +30,15 @@ def start_server():
                     if not chunk:
                         break
                     data += chunk
-
+                
                 try:
                     event = json.loads(data.decode("utf-8"))
-                    print("[EVENT RECEIVED]")
-                    print(json.dumps(event, indent=4))
+                    
+                    if not validate_event(event):
+                            print("[!] Invalid event, dropping")
+                            return
+                    store_event(event)
+                    print(f"[+] Event accepted from agent {event['agent']['id']}")
                 except json.JSONDecodeError as e:
                     print(f"[!] Failed to decode JSON: {e}")
 
