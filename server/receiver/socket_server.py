@@ -3,6 +3,8 @@ import json
 
 from shared.schema import validate_event
 from server.storage.events import store_event
+from server.detection.rules import detect_ssh_bruteforce
+from server.detection.rules import detect_privilege_escalation
 
 HOST = "0.0.0.0"   # Listen on all interfaces
 PORT = 9001       # Arbitrary non-privileged port
@@ -38,6 +40,14 @@ def start_server():
                             print("[!] Invalid event, dropping")
                             return
                     store_event(event)
+                    alert = detect_ssh_bruteforce(event)
+                    if alert:
+                        print("[ALERT DETECTED]")
+                        print(alert)
+                    escalation_alert = detect_privilege_escalation(event)
+                    if escalation_alert:
+                        print("[!!! PRIVILEGE ESCALATION ALERT !!!]")
+                        print(escalation_alert)
                     print(f"[+] Event accepted from agent {event['agent']['id']}")
                 except json.JSONDecodeError as e:
                     print(f"[!] Failed to decode JSON: {e}")
