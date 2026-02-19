@@ -1,0 +1,16 @@
+[
+  {
+    "alert_type": "privilege_escalation",
+    "severity": "medium",
+    "username": null,
+    "command": "/usr/bin/whoami",
+    "timestamp": "2026-02-16T15:26:41.852089Z"
+  },
+  {
+    "alert_type": "privilege_escalation",
+    "severity": "medium",
+    "username": null,
+    "command": "/usr/bin/whoami",
+    "timestamp": "2026-02-16T15:32:00.461975Z"
+  }
+]

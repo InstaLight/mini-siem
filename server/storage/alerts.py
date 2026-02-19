@@ -1,18 +1,12 @@
-import json
-import os
-
-ALERTS_FILE = "server/storage/alerts.json"
+"""Alert storage - persists to alerts.json with thread-safe append."""
+from server.storage.file_io import append_to_json_list, clear_json_list, ALERTS_FILE, alerts_lock
 
 
-def store_alert(alert):
-    if not os.path.exists(ALERTS_FILE):
-        with open(ALERTS_FILE, "w") as f:
-            json.dump([], f)
+def clear_alerts() -> bool:
+    """Clear all alerts (for demo purposes). Returns True on success."""
+    return clear_json_list(ALERTS_FILE, alerts_lock)
 
-    with open(ALERTS_FILE, "r") as f:
-        alerts = json.load(f)
 
-    alerts.append(alert)
-
-    with open(ALERTS_FILE, "w") as f:
-        json.dump(alerts, f, indent=2)
+def store_alert(alert: dict) -> bool:
+    """Persist alert to alerts.json. Returns True on success."""
+    return append_to_json_list(ALERTS_FILE, alert, alerts_lock)

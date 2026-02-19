@@ -10,6 +10,12 @@ FAILED_SSH_REGEX = re.compile(
     r"Failed password for (invalid user )?(?P<user>\S+) from (?P<ip>\d+\.\d+\.\d+\.\d+)"
 )
 
+# ---- SUDO INCORRECT PASSWORD REGEX ----
+# Matches: sudo:    user : 1 incorrect password attempt ; TTY=...
+SUDO_BAD_PASSWORD_REGEX = re.compile(
+    r"sudo:.*?(?P<user>\w+)\s*:\s+1 incorrect password attempt"
+)
+
 # ---- SUDO PRIVILEGE ESCALATION REGEX ----
 # Matches lines like:
 # sudo:    insta : TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami
@@ -59,7 +65,31 @@ def parse_auth_log(agent_info):
                 }
 
             # -------------------------------
-            # 2️⃣ Privilege Escalation Detection
+            # 2️⃣ Sudo Incorrect Password Detection
+            # -------------------------------
+            sudo_bad_match = SUDO_BAD_PASSWORD_REGEX.search(line)
+            if sudo_bad_match:
+                print("[DEBUG] SUDO INCORRECT PASSWORD MATCH FOUND")
+                yield {
+                    "agent": agent_info,
+                    "event": {
+                        "id": str(uuid.uuid4()),
+                        "timestamp": datetime.utcnow().isoformat() + "Z",
+                        "source": "auth_log",
+                        "type": "incorrect_password",
+                        "severity": "medium",
+                    },
+                    "data": {
+                        "user": sudo_bad_match.group("user"),
+                        "service": "sudo",
+                        "message": line.strip()
+                    },
+                    "raw": line.strip()
+                }
+                continue  # Don't also match as privilege escalation
+
+            # -------------------------------
+            # 3️⃣ Privilege Escalation Detection
             # -------------------------------
             sudo_match = SUDO_REGEX.search(line)
             if sudo_match:

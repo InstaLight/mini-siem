@@ -7,3 +7,7 @@ server:
 agent:
 	@echo "Starting SIEM agent..."
 	sudo python3 -m agent.main
+
+web-ui:
+	@echo "Starting Web-UI..."
+	python -m uvicorn server.web.main:app --reload --port 8000

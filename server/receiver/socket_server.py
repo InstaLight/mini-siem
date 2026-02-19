@@ -7,12 +7,14 @@ from server.storage.events import store_event
 from server.storage.alerts import store_alert
 from server.detection.rules import (
     detect_ssh_bruteforce,
-    detect_privilege_escalation
+    detect_privilege_escalation,
+    detect_failed_password,
 )
+
 
 HOST = "0.0.0.0"
 PORT = 9001  # Use your updated port
-
+BUFFER_SIZE = 4096
 
 def handle_client(conn, addr):
     print(f"[+] Connected to agent: {addr}")
@@ -35,7 +37,9 @@ def handle_client(conn, addr):
                     continue
 
                 try:
+                    print("[DEBUG RAW LINE]:", repr(line))
                     event = json.loads(line)
+                    print("[DEBUG] EVENT RECIEVED:", event)
 
                     # Validate schema
                     validate_event(event)
@@ -46,6 +50,11 @@ def handle_client(conn, addr):
                     # Run detection rules
                     brute_alert = detect_ssh_bruteforce(event)
                     escalation_alert = detect_privilege_escalation(event)
+                    failed_pw_alert = detect_failed_password(event)
+
+                    # Handle failed password alert (each incorrect attempt)
+                    if failed_pw_alert:
+                        store_alert(failed_pw_alert)
 
                     # Handle brute force alert
                     if brute_alert:
@@ -57,6 +66,7 @@ def handle_client(conn, addr):
                     if escalation_alert:
                         print("\n[!!! PRIVILEGE ESCALATION ALERT !!!]")
                         print(json.dumps(escalation_alert, indent=2))
+                        print("[DEBUG] Writing alert to file...")
                         store_alert(escalation_alert)
 
                 except json.JSONDecodeError:

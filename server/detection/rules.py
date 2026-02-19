@@ -30,6 +30,8 @@ def detect_ssh_bruteforce(event: dict):
         return {
             "alert_type": "ssh_bruteforce",
             "severity": "high",
+            "timestamp": event["event"]["timestamp"],
+            "client_id": event["agent"].get("id"),
             "src_ip": src_ip,
             "count": len(attempts),
             "time_window_seconds": TIME_WINDOW.seconds,
@@ -38,6 +40,25 @@ def detect_ssh_bruteforce(event: dict):
 
     return None
 
+
+def detect_failed_password(event: dict):
+    """Alert on each incorrect password attempt (SSH, sudo, etc.)."""
+    if event["event"]["type"] != "authentication_failure" and event["event"]["type"] != "incorrect_password":
+        return None
+
+    data = event["data"]
+    return {
+        "alert_type": "failed_password",
+        "severity": "low",
+        "timestamp": event["event"]["timestamp"],
+        "client_id": event["agent"].get("id"),
+        "username": data.get("user"),
+        "src_ip": data.get("src_ip"),
+        "service": data.get("service", "unknown"),
+        "message": data.get("message", "")[:200],
+    }
+
+
 def detect_privilege_escalation(event: dict):
     if event["event"]["type"] != "privilege_escalation":
         return None
@@ -45,7 +66,8 @@ def detect_privilege_escalation(event: dict):
     return {
         "alert_type": "privilege_escalation",
         "severity": "medium",
-        "username": event["data"].get("username"),
+        "username": event["data"].get("user"),
+        "client_id": event["agent"].get("id"),
         "command": event["data"].get("command"),
         "timestamp": event["event"]["timestamp"]
     }

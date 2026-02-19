@@ -12,19 +12,24 @@
 </head>
 <body>
     <h1>Security Alerts</h1>
+    <form action="/alerts/clear" method="post" style="margin-bottom: 1rem;">
+        <button type="submit">Clear Alerts</button>
+    </form>
 
     <table>
         <tr>
             <th>Type</th>
             <th>Severity</th>
             <th>User</th>
+            <th>Client ID</th>
             <th>Timestamp</th>
         </tr>
         {% for alert in alerts %}
         <tr>
             <td>{{ alert.alert_type }}</td>
             <td>{{ alert.severity }}</td>
-            <td>{{ alert.username }}</td>
+            <td>{{ alert.username or alert.src_ip or '-' }}</td>
+            <td>{{ alert.client_id or '-' }}</td>
             <td>{{ alert.timestamp }}</td>
         </tr>
         {% endfor %}

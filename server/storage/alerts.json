@@ -1,0 +1,70 @@
+[
+  {
+    "alert_type": "privilege_escalation",
+    "severity": "medium",
+    "username": "insta",
+    "client_id": "linux-agent-01",
+    "command": "/usr/bin/whoami",
+    "timestamp": "2026-02-19T23:25:58.227490Z"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-02-19T23:26:32.235376Z",
+    "client_id": "linux-agent-01",
+    "username": "fakeuser",
+    "src_ip": "127.0.0.1",
+    "service": "ssh",
+    "message": "2026-02-19T18:26:32.182630-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-02-19T23:26:37.236488Z",
+    "client_id": "linux-agent-01",
+    "username": "fakeuser",
+    "src_ip": "127.0.0.1",
+    "service": "ssh",
+    "message": "2026-02-19T18:26:36.908213-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-02-19T23:26:41.237420Z",
+    "client_id": "linux-agent-01",
+    "username": "fakeuser",
+    "src_ip": "127.0.0.1",
+    "service": "ssh",
+    "message": "2026-02-19T18:26:40.838148-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-02-19T23:26:51.239513Z",
+    "client_id": "linux-agent-01",
+    "username": "fakeuser",
+    "src_ip": "127.0.0.1",
+    "service": "ssh",
+    "message": "2026-02-19T18:26:50.965746-05:00 insta-pc sshd[74855]: Failed password for invalid user fakeuser from 127.0.0.1 port 58178 ssh2"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-02-19T23:26:54.740263Z",
+    "client_id": "linux-agent-01",
+    "username": "fakeuser",
+    "src_ip": "127.0.0.1",
+    "service": "ssh",
+    "message": "2026-02-19T18:26:54.649695-05:00 insta-pc sshd[74855]: Failed password for invalid user fakeuser from 127.0.0.1 port 58178 ssh2"
+  },
+  {
+    "alert_type": "ssh_bruteforce",
+    "severity": "high",
+    "timestamp": "2026-02-19T23:26:54.740263Z",
+    "client_id": "linux-agent-01",
+    "src_ip": "127.0.0.1",
+    "count": 5,
+    "time_window_seconds": 60,
+    "last_seen": "2026-02-19T23:26:54.740263Z"
+  }
+]
