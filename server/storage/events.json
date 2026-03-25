@@ -712,5 +712,237 @@
       "message": "2026-02-19T18:26:54.649695-05:00 insta-pc sshd[74855]: Failed password for invalid user fakeuser from 127.0.0.1 port 58178 ssh2"
     },
     "raw": "2026-02-19T18:26:54.649695-05:00 insta-pc sshd[74855]: Failed password for invalid user fakeuser from 127.0.0.1 port 58178 ssh2"
+  },
+  {
+    "agent": {
+      "id": "linux-agent-01",
+      "hostname": "insta-pc",
+      "os": "linux"
+    },
+    "event": {
+      "id": "826e6d84-899c-4fd5-afe4-4e94986ce72d",
+      "timestamp": "2026-02-20T16:27:35.133787Z",
+      "source": "auth_log",
+      "type": "incorrect_password",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "insta",
+      "service": "sudo",
+      "message": "2026-02-20T11:27:35.004766-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+    },
+    "raw": "2026-02-20T11:27:35.004766-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+  },
+  {
+    "agent": {
+      "id": "linux-agent-01",
+      "hostname": "insta-pc",
+      "os": "linux"
+    },
+    "event": {
+      "id": "f34db6f2-557a-4ede-a043-52cf5a2aec1f",
+      "timestamp": "2026-02-20T16:31:45.573017Z",
+      "source": "auth_log",
+      "type": "incorrect_password",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "insta",
+      "service": "sudo",
+      "message": "2026-02-20T11:31:45.168637-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+    },
+    "raw": "2026-02-20T11:31:45.168637-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+  },
+  {
+    "agent": {
+      "id": "linux-agent-01",
+      "hostname": "insta-pc",
+      "os": "linux"
+    },
+    "event": {
+      "id": "10cda241-b1eb-4fe3-9987-d98e5d4b25c0",
+      "timestamp": "2026-02-20T16:32:16.583195Z",
+      "source": "auth_log",
+      "type": "privilege_escalation",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "insta",
+      "command": "/usr/bin/whoami",
+      "service": "sudo",
+      "message": "2026-02-20T11:32:16.222351-05:00 insta-pc sudo:    insta : TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+    },
+    "raw": "2026-02-20T11:32:16.222351-05:00 insta-pc sudo:    insta : TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+  },
+  {
+    "agent": {
+      "id": "linux-agent-01",
+      "hostname": "insta-pc",
+      "os": "linux"
+    },
+    "event": {
+      "id": "3202af1e-ec10-4750-b32d-15ec2856352a",
+      "timestamp": "2026-02-20T16:32:46.093427Z",
+      "source": "auth_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "fakeuser",
+      "src_ip": "127.0.0.1",
+      "service": "ssh",
+      "message": "2026-02-20T11:32:45.693776-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
+    },
+    "raw": "2026-02-20T11:32:45.693776-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
+  },
+  {
+    "agent": {
+      "id": "linux-agent-01",
+      "hostname": "insta-pc",
+      "os": "linux"
+    },
+    "event": {
+      "id": "8bcfbdd6-7e1f-4716-8a77-019b01b3435b",
+      "timestamp": "2026-02-20T16:32:50.094979Z",
+      "source": "auth_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "fakeuser",
+      "src_ip": "127.0.0.1",
+      "service": "ssh",
+      "message": "2026-02-20T11:32:49.972840-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
+    },
+    "raw": "2026-02-20T11:32:49.972840-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
+  },
+  {
+    "agent": {
+      "id": "linux-agent-01",
+      "hostname": "insta-pc",
+      "os": "linux"
+    },
+    "event": {
+      "id": "44abd4de-433c-4c66-a37d-7a892dad6e37",
+      "timestamp": "2026-02-20T16:32:53.096273Z",
+      "source": "auth_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "fakeuser",
+      "src_ip": "127.0.0.1",
+      "service": "ssh",
+      "message": "2026-02-20T11:32:52.864731-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
+    },
+    "raw": "2026-02-20T11:32:52.864731-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
+  },
+  {
+    "agent": {
+      "id": "linux-agent-01",
+      "hostname": "insta-pc",
+      "os": "linux"
+    },
+    "event": {
+      "id": "4e44ec64-3adb-4fac-bb57-08e70608a68b",
+      "timestamp": "2026-02-20T16:32:59.098755Z",
+      "source": "auth_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "fakeuser",
+      "src_ip": "127.0.0.1",
+      "service": "ssh",
+      "message": "2026-02-20T11:32:58.843825-05:00 insta-pc sshd[143084]: Failed password for invalid user fakeuser from 127.0.0.1 port 45440 ssh2"
+    },
+    "raw": "2026-02-20T11:32:58.843825-05:00 insta-pc sshd[143084]: Failed password for invalid user fakeuser from 127.0.0.1 port 45440 ssh2"
+  },
+  {
+    "agent": {
+      "id": "linux-agent-01",
+      "hostname": "insta-pc",
+      "os": "linux"
+    },
+    "event": {
+      "id": "1275fe3b-500d-4c5e-affd-d9840dd15605",
+      "timestamp": "2026-02-20T16:33:03.600512Z",
+      "source": "auth_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "fakeuser",
+      "src_ip": "127.0.0.1",
+      "service": "ssh",
+      "message": "2026-02-20T11:33:03.266499-05:00 insta-pc sshd[143084]: Failed password for invalid user fakeuser from 127.0.0.1 port 45440 ssh2"
+    },
+    "raw": "2026-02-20T11:33:03.266499-05:00 insta-pc sshd[143084]: Failed password for invalid user fakeuser from 127.0.0.1 port 45440 ssh2"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "insta-pc",
+      "os": "linux",
+      "ip": "10.132.79.27"
+    },
+    "event": {
+      "id": "04adc26e-03be-4f2d-bed6-93b5c24b33ae",
+      "timestamp": "2026-03-25T02:04:41.736Z",
+      "source": "linux_auth_log",
+      "type": "incorrect_password",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "insta",
+      "service": "sudo",
+      "message": "2026-03-24T22:04:41.492926-04:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami",
+      "src_ip": ""
+    },
+    "raw": "2026-03-24T22:04:41.492926-04:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "insta-pc",
+      "os": "linux",
+      "ip": "10.132.79.27"
+    },
+    "event": {
+      "id": "56edaa25-1bd7-4c79-bb63-4dd354042b09",
+      "timestamp": "2026-03-25T02:04:51.738Z",
+      "source": "linux_auth_log",
+      "type": "incorrect_password",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "insta",
+      "service": "sudo",
+      "message": "2026-03-24T22:04:51.400692-04:00 insta-pc sudo: pam_unix(sudo:auth): authentication failure; logname= uid=1000 euid=0 tty=/dev/pts/4 ruser=insta rhost=  user=insta",
+      "src_ip": ""
+    },
+    "raw": "2026-03-24T22:04:51.400692-04:00 insta-pc sudo: pam_unix(sudo:auth): authentication failure; logname= uid=1000 euid=0 tty=/dev/pts/4 ruser=insta rhost=  user=insta"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "insta-pc",
+      "os": "linux",
+      "ip": "10.132.79.27"
+    },
+    "event": {
+      "id": "5aeffa88-669d-44a0-bf3e-fdeba9edd348",
+      "timestamp": "2026-03-25T02:04:59.240Z",
+      "source": "linux_auth_log",
+      "type": "incorrect_password",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "insta",
+      "service": "sudo",
+      "message": "2026-03-24T22:04:59.091650-04:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami",
+      "src_ip": ""
+    },
+    "raw": "2026-03-24T22:04:59.091650-04:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
   }
 ]

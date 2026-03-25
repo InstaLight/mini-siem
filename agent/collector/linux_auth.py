@@ -1,32 +1,50 @@
-import time
+"""
+Linux /var/log/auth.log collector — normalizes lines into shared SIEM envelope.
+"""
 import re
-from datetime import datetime
-import uuid
+import time
+
+from shared.event_builder import make_event
 
 AUTH_LOG_PATH = "/var/log/auth.log"
 
-# ---- FAILED SSH LOGIN REGEX ----
 FAILED_SSH_REGEX = re.compile(
     r"Failed password for (invalid user )?(?P<user>\S+) from (?P<ip>\d+\.\d+\.\d+\.\d+)"
 )
 
-# ---- SUDO INCORRECT PASSWORD REGEX ----
-# Matches: sudo:    user : 1 incorrect password attempt ; TTY=...
-SUDO_BAD_PASSWORD_REGEX = re.compile(
-    r"sudo:.*?(?P<user>\w+)\s*:\s+1 incorrect password attempt"
+# Successful SSH (for new rules: suspicious time, new IP per user)
+ACCEPTED_SSH_REGEX = re.compile(
+    r"Accepted (?:password|publickey) for (?P<user>\S+) from (?P<ip>\d+\.\d+\.\d+\.\d+)"
 )
 
-# ---- SUDO PRIVILEGE ESCALATION REGEX ----
-# Matches lines like:
-# sudo:    insta : TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami
+# Traditional sudo line (Debian/Ubuntu): "sudo: user : 1 incorrect password attempt ; TTY=..."
+# Also allow plural / multiple attempts and dotted usernames.
+SUDO_BAD_PASSWORD_REGEX = re.compile(
+    r"sudo:.*?(?P<user>[\w.-]+)\s*:\s+\d+\s+incorrect password attempts?\b",
+    re.I,
+)
+
+# Same message without "user :" prefix on some versions: "sudo: 2 incorrect password attempts"
+SUDO_BAD_PASSWORD_NO_USER = re.compile(
+    r"sudo:\s+(?P<count>\d+)\s+incorrect password attempts?\b",
+    re.I,
+)
+
+# Very common on modern Ubuntu/Debian (rsyslog/journal forwarded to auth.log):
+# pam_unix(sudo:auth): authentication failure; ... user=insta
+PAM_SUDO_AUTH_FAILURE = re.compile(
+    r"pam_unix\(sudo:auth\):\s*authentication failure[^\n]*\buser=(?P<user>\S+)",
+    re.I,
+)
+
 SUDO_REGEX = re.compile(
-    r"sudo:\s+(?P<user>\w+)\s*:\s+.*COMMAND=(?P<command>.+)"
+    r"sudo:\s+(?P<user>[\w.-]+)\s*:\s+.*COMMAND=(?P<command>.+)"
 )
 
 
 def follow(file):
-    """Generator that yields new lines as they are written (like tail -f)."""
-    file.seek(0, 2)  # Go to end of file
+    """Yield new lines as they appear (tail -f style)."""
+    file.seek(0, 2)
     while True:
         line = file.readline()
         if not line:
@@ -35,80 +53,108 @@ def follow(file):
         yield line
 
 
-def parse_auth_log(agent_info):
+def parse_auth_log(agent_info: dict):
     with open(AUTH_LOG_PATH, "r") as f:
         for line in follow(f):
+            line = line.rstrip("\n")
 
-            # -------------------------------
-            # 1️⃣ Failed SSH Login Detection
-            # -------------------------------
-            ssh_match = FAILED_SSH_REGEX.search(line)
-            if ssh_match:
-                print("[DEBUG] SSH FAILURE MATCH FOUND")
-
-                yield {
-                    "agent": agent_info,
-                    "event": {
-                        "id": str(uuid.uuid4()),
-                        "timestamp": datetime.utcnow().isoformat() + "Z",
-                        "source": "auth_log",
-                        "type": "authentication_failure",
-                        "severity": "medium",
-                    },
-                    "data": {
-                        "user": ssh_match.group("user"),
-                        "src_ip": ssh_match.group("ip"),
+            m = FAILED_SSH_REGEX.search(line)
+            if m:
+                yield make_event(
+                    agent=agent_info.copy(),
+                    event_type="authentication_failure",
+                    severity="medium",
+                    data={
+                        "user": m.group("user"),
+                        "src_ip": m.group("ip"),
                         "service": "ssh",
-                        "message": line.strip()
+                        "message": line.strip(),
                     },
-                    "raw": line.strip()
-                }
+                    raw=line,
+                    source="linux_auth_log",
+                )
+                continue
 
-            # -------------------------------
-            # 2️⃣ Sudo Incorrect Password Detection
-            # -------------------------------
-            sudo_bad_match = SUDO_BAD_PASSWORD_REGEX.search(line)
-            if sudo_bad_match:
-                print("[DEBUG] SUDO INCORRECT PASSWORD MATCH FOUND")
-                yield {
-                    "agent": agent_info,
-                    "event": {
-                        "id": str(uuid.uuid4()),
-                        "timestamp": datetime.utcnow().isoformat() + "Z",
-                        "source": "auth_log",
-                        "type": "incorrect_password",
-                        "severity": "medium",
+            m = ACCEPTED_SSH_REGEX.search(line)
+            if m:
+                yield make_event(
+                    agent=agent_info.copy(),
+                    event_type="successful_login",
+                    severity="low",
+                    data={
+                        "user": m.group("user"),
+                        "src_ip": m.group("ip"),
+                        "service": "ssh",
+                        "message": line.strip(),
                     },
-                    "data": {
-                        "user": sudo_bad_match.group("user"),
+                    raw=line,
+                    source="linux_auth_log",
+                )
+                continue
+
+            m = SUDO_BAD_PASSWORD_REGEX.search(line)
+            if m:
+                yield make_event(
+                    agent=agent_info.copy(),
+                    event_type="incorrect_password",
+                    severity="medium",
+                    data={
+                        "user": m.group("user"),
                         "service": "sudo",
-                        "message": line.strip()
+                        "message": line.strip(),
                     },
-                    "raw": line.strip()
-                }
-                continue  # Don't also match as privilege escalation
+                    raw=line,
+                    source="linux_auth_log",
+                )
+                continue
 
-            # -------------------------------
-            # 3️⃣ Privilege Escalation Detection
-            # -------------------------------
-            sudo_match = SUDO_REGEX.search(line)
-            if sudo_match:
-                print("[DEBUG] SUDO MATCH FOUND")
-
-                yield {
-                    "agent": agent_info,
-                    "event": {
-                        "id": str(uuid.uuid4()),
-                        "timestamp": datetime.utcnow().isoformat() + "Z",
-                        "source": "auth_log",
-                        "type": "privilege_escalation",
-                        "severity": "medium",
-                    },
-                    "data": {
-                        "user": sudo_match.group("user"),
-                        "command": sudo_match.group("command").strip(),
+            m = SUDO_BAD_PASSWORD_NO_USER.search(line)
+            if m:
+                yield make_event(
+                    agent=agent_info.copy(),
+                    event_type="incorrect_password",
+                    severity="medium",
+                    data={
+                        "user": "",
                         "service": "sudo",
-                        "message": line.strip()
+                        "message": line.strip(),
                     },
-                    "raw": line.strip()
-                }
+                    raw=line,
+                    source="linux_auth_log",
+                )
+                continue
+
+            m = PAM_SUDO_AUTH_FAILURE.search(line)
+            if m:
+                user = m.group("user").strip()
+                if user.endswith(";"):
+                    user = user[:-1]
+                yield make_event(
+                    agent=agent_info.copy(),
+                    event_type="incorrect_password",
+                    severity="medium",
+                    data={
+                        "user": user,
+                        "service": "sudo",
+                        "message": line.strip(),
+                    },
+                    raw=line,
+                    source="linux_auth_log",
+                )
+                continue
+
+            m = SUDO_REGEX.search(line)
+            if m:
+                yield make_event(
+                    agent=agent_info.copy(),
+                    event_type="privilege_escalation",
+                    severity="medium",
+                    data={
+                        "user": m.group("user"),
+                        "command": m.group("command").strip(),
+                        "service": "sudo",
+                        "message": line.strip(),
+                    },
+                    raw=line,
+                    source="linux_auth_log",
+                )

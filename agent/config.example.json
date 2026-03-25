@@ -1,0 +1,12 @@
+{
+  "server_host": "192.168.1.10",
+  "server_port": 9001,
+  "reconnect_delay_seconds": 5,
+  "send_retry_seconds": 2,
+  "agent": {
+    "id": "agent-001",
+    "hostname": null,
+    "os": null,
+    "ip": null
+  }
+}

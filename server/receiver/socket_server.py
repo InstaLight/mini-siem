@@ -1,19 +1,19 @@
+"""
+TCP newline-delimited JSON receiver. One agent connection = one thread.
+Future: wrap this socket in TLS (``ssl.wrap_socket`` or asyncio TLS) without
+changing the JSON message format.
+"""
+import json
 import socket
 import threading
-import json
 
 from shared.schema import validate_event
-from server.storage.events import store_event
+from server.detection import run_detectors
 from server.storage.alerts import store_alert
-from server.detection.rules import (
-    detect_ssh_bruteforce,
-    detect_privilege_escalation,
-    detect_failed_password,
-)
-
+from server.storage.events import store_event
 
 HOST = "0.0.0.0"
-PORT = 9001  # Use your updated port
+PORT = 9001
 BUFFER_SIZE = 4096
 
 def handle_client(conn, addr):
@@ -47,27 +47,12 @@ def handle_client(conn, addr):
                     # Store event
                     store_event(event)
 
-                    # Run detection rules
-                    brute_alert = detect_ssh_bruteforce(event)
-                    escalation_alert = detect_privilege_escalation(event)
-                    failed_pw_alert = detect_failed_password(event)
-
-                    # Handle failed password alert (each incorrect attempt)
-                    if failed_pw_alert:
-                        store_alert(failed_pw_alert)
-
-                    # Handle brute force alert
-                    if brute_alert:
-                        print("\n[!!! BRUTE FORCE ALERT !!!]")
-                        print(json.dumps(brute_alert, indent=2))
-                        store_alert(brute_alert)
-
-                    # Handle escalation alert
-                    if escalation_alert:
-                        print("\n[!!! PRIVILEGE ESCALATION ALERT !!!]")
-                        print(json.dumps(escalation_alert, indent=2))
-                        print("[DEBUG] Writing alert to file...")
-                        store_alert(escalation_alert)
+                    # Run modular detection pipeline
+                    for alert in run_detectors(event):
+                        sev = alert.get("severity", "").upper()
+                        print(f"\n[ALERT:{sev}] {alert.get('alert_type')}")
+                        print(json.dumps(alert, indent=2))
+                        store_alert(alert)
 
                 except json.JSONDecodeError:
                     print("[!] Invalid JSON received")
