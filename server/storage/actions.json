@@ -1,0 +1,153 @@
+[
+  {
+    "action_id": "26b4fbd7-5534-4701-a92f-63ec82842413",
+    "action_type": "isolate_host",
+    "requested_by": "dashboard",
+    "target_ids": [],
+    "dry_run": true,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:12:32.823311Z",
+    "completed_at": "2026-04-29T17:12:32.823339Z",
+    "details": {
+      "result": "Dry run: isolate_host not executed"
+    }
+  },
+  {
+    "action_id": "66c93543-821a-4c99-92c6-7c257f8ee83b",
+    "action_type": "isolate_host",
+    "requested_by": "dashboard",
+    "target_ids": [],
+    "dry_run": true,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:19:01.014774Z",
+    "completed_at": "2026-04-29T17:19:01.014830Z",
+    "details": {
+      "result": "Dry run: isolate_host not executed"
+    }
+  },
+  {
+    "action_id": "b0ef46a1-f6a4-42a8-a13f-d52658c1fc8c",
+    "action_type": "isolate_host",
+    "requested_by": "dashboard",
+    "target_ids": [],
+    "dry_run": true,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:19:02.287887Z",
+    "completed_at": "2026-04-29T17:19:02.287920Z",
+    "details": {
+      "result": "Dry run: isolate_host not executed"
+    }
+  },
+  {
+    "action_id": "fa6f98f8-a78a-4fb8-9850-47fabff7c1f4",
+    "action_type": "isolate_host",
+    "requested_by": "dashboard",
+    "target_ids": [
+      "9603b8a9-3d2b-4050-9aaf-a27b9b586ec9"
+    ],
+    "dry_run": true,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:19:07.670482Z",
+    "completed_at": "2026-04-29T17:19:07.670516Z",
+    "details": {
+      "result": "Dry run: isolate_host not executed"
+    }
+  },
+  {
+    "action_id": "005907c7-a805-4ab6-8d46-efc94f28abcd",
+    "action_type": "terminate_process",
+    "requested_by": "dashboard",
+    "target_ids": [],
+    "dry_run": true,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:19:11.786989Z",
+    "completed_at": "2026-04-29T17:19:11.787052Z",
+    "details": {
+      "result": "Dry run: terminate_process not executed"
+    }
+  },
+  {
+    "action_id": "c89e4315-8887-473e-90bc-d3bf64120768",
+    "action_type": "isolate_host",
+    "requested_by": "admin-page",
+    "target_ids": [
+      "17e67047-616c-4a14-8651-3eb846cd0e2e"
+    ],
+    "dry_run": true,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:26:05.102334Z",
+    "completed_at": "2026-04-29T17:26:05.102372Z",
+    "details": {
+      "result": "Dry run: isolate_host not executed"
+    }
+  },
+  {
+    "action_id": "d570a9e2-9a8a-47b3-b60c-e1d383cc8871",
+    "action_type": "terminate_process",
+    "requested_by": "admin-page",
+    "target_ids": [
+      "05902fe5-ee32-4f4d-b47a-fb86d8b1ed95"
+    ],
+    "dry_run": false,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:43:18.120917Z",
+    "completed_at": "2026-04-29T17:43:18.120956Z",
+    "details": {
+      "attempted_pids": [],
+      "failed": []
+    }
+  },
+  {
+    "action_id": "237fd4ce-2567-4867-a240-59f39e2d9ac7",
+    "action_type": "isolate_host",
+    "requested_by": "admin-page",
+    "target_ids": [
+      "b12b3156-cba2-4579-8516-3251bb19feb6",
+      "7e0b3343-21c3-4a58-8ba2-cdf441d175df",
+      "05902fe5-ee32-4f4d-b47a-fb86d8b1ed95",
+      "c6ff7003-268b-472d-bad1-acff7c0e4ff9",
+      "2c5fd982-1baf-4514-a4a3-8bdefe192648"
+    ],
+    "dry_run": false,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:43:24.366154Z",
+    "completed_at": "2026-04-29T17:43:24.366174Z",
+    "details": {
+      "result": "Placeholder: host isolation agent integration pending"
+    }
+  },
+  {
+    "action_id": "1d890069-0f3e-4b45-9233-484afe2be19a",
+    "action_type": "isolate_host",
+    "requested_by": "admin-page",
+    "target_ids": [
+      "17e67047-616c-4a14-8651-3eb846cd0e2e",
+      "f07aab56-5385-41f4-a0fd-ce692ea8674e",
+      "fe8243e8-d580-41ea-9e41-10cedae7794a",
+      "13007bcf-f5ce-44ac-b2da-e80903764917",
+      "87ebf031-3277-4a33-be25-51407e866f99",
+      "f4b4a8e4-146a-460f-a9b0-88db70367b14",
+      "4bf42a8b-7a97-4c42-9c51-9f4748eed4cb",
+      "cb43c024-37b1-4c04-ae26-5b16afd83f98",
+      "4e83ce70-8127-4c6c-9595-a2d9f395c2ae",
+      "cee5416b-61ae-4c14-8419-e3e09325f958",
+      "2f254927-f325-4d45-92d3-50a5850ae816",
+      "e69b551d-baa6-499c-8e68-6fd0a7741193",
+      "3c5484fb-610e-4ae4-93dd-5774687ec4ce",
+      "76608c61-37f2-43dd-af1d-87dd791514a4",
+      "b0a582e1-9cad-4115-befa-6cfb764d0c7f",
+      "ad6ec04d-2c91-40a8-830d-76d1ec5bd94a",
+      "f0846bc1-393a-4a38-bab3-d4a76440dc8b",
+      "93578d6e-d569-4f41-b546-0101638ddd60",
+      "e27e4c5f-111f-48b0-98b6-1d1492a80562",
+      "739030c2-a3ba-49e2-8722-80cfae8556c1"
+    ],
+    "dry_run": false,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:43:44.081540Z",
+    "completed_at": "2026-04-29T17:43:44.081561Z",
+    "details": {
+      "result": "Placeholder: host isolation agent integration pending"
+    }
+  }
+]

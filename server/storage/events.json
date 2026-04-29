@@ -1,948 +1,468 @@
 [
   {
     "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "9c50abfa-a1e5-45da-bbfd-9cbfcb08242c",
-      "timestamp": "2026-02-19T03:41:34.300347Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-18T22:41:33.896576-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-18T22:41:33.896576-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "fd6b8612-ae7a-4c75-89b5-24737e4cad00",
-      "timestamp": "2026-02-19T03:42:04.308890Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:42:04.281998-05:00 insta-pc sshd[56252]: Failed password for invalid user fakeuser from 127.0.0.1 port 49720 ssh2"
-    },
-    "raw": "2026-02-18T22:42:04.281998-05:00 insta-pc sshd[56252]: Failed password for invalid user fakeuser from 127.0.0.1 port 49720 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "0e8faa52-9022-492e-b315-6e7fa8233544",
-      "timestamp": "2026-02-19T03:42:10.310910Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:42:10.025033-05:00 insta-pc sshd[56252]: Failed password for invalid user fakeuser from 127.0.0.1 port 49720 ssh2"
-    },
-    "raw": "2026-02-18T22:42:10.025033-05:00 insta-pc sshd[56252]: Failed password for invalid user fakeuser from 127.0.0.1 port 49720 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "8d011bd9-8854-4d0e-a3a4-e69a3ddc9c3d",
-      "timestamp": "2026-02-19T03:42:14.312503Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:42:13.998448-05:00 insta-pc sshd[56252]: Failed password for invalid user fakeuser from 127.0.0.1 port 49720 ssh2"
-    },
-    "raw": "2026-02-18T22:42:13.998448-05:00 insta-pc sshd[56252]: Failed password for invalid user fakeuser from 127.0.0.1 port 49720 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "8af74ec5-1835-468c-940f-9324d9419184",
-      "timestamp": "2026-02-19T03:42:22.314993Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:42:22.212891-05:00 insta-pc sshd[56276]: Failed password for invalid user fakeuser from 127.0.0.1 port 38386 ssh2"
-    },
-    "raw": "2026-02-18T22:42:22.212891-05:00 insta-pc sshd[56276]: Failed password for invalid user fakeuser from 127.0.0.1 port 38386 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "ae62296f-01ae-4555-9049-5a5b8b64ee85",
-      "timestamp": "2026-02-19T03:42:26.316584Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:42:25.950812-05:00 insta-pc sshd[56276]: Failed password for invalid user fakeuser from 127.0.0.1 port 38386 ssh2"
-    },
-    "raw": "2026-02-18T22:42:25.950812-05:00 insta-pc sshd[56276]: Failed password for invalid user fakeuser from 127.0.0.1 port 38386 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "562b6f4a-e74d-476a-a497-15a6a7fbd245",
-      "timestamp": "2026-02-19T03:42:31.318624Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:42:31.146155-05:00 insta-pc sshd[56276]: Failed password for invalid user fakeuser from 127.0.0.1 port 38386 ssh2"
-    },
-    "raw": "2026-02-18T22:42:31.146155-05:00 insta-pc sshd[56276]: Failed password for invalid user fakeuser from 127.0.0.1 port 38386 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "d33b53ea-b8c1-48be-a5cb-1025a7ed130a",
-      "timestamp": "2026-02-19T03:43:13.830382Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-18T22:43:13.536695-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-18T22:43:13.536695-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "a2416447-95d6-42cc-b8d5-508ba232a2ea",
-      "timestamp": "2026-02-19T03:45:44.243656Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-18T22:45:43.806377-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-18T22:45:43.806377-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "11398478-df9d-4643-babb-4d174081085e",
-      "timestamp": "2026-02-19T03:45:54.246881Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:45:54.193964-05:00 insta-pc sshd[57058]: Failed password for invalid user fake from 127.0.0.1 port 47682 ssh2"
-    },
-    "raw": "2026-02-18T22:45:54.193964-05:00 insta-pc sshd[57058]: Failed password for invalid user fake from 127.0.0.1 port 47682 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "9db4a7d4-4f76-48ae-b565-a49c903b82a0",
-      "timestamp": "2026-02-19T03:45:59.748904Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:45:59.655976-05:00 insta-pc sshd[57058]: Failed password for invalid user fake from 127.0.0.1 port 47682 ssh2"
-    },
-    "raw": "2026-02-18T22:45:59.655976-05:00 insta-pc sshd[57058]: Failed password for invalid user fake from 127.0.0.1 port 47682 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "a4112342-b271-4c5e-bdb7-b3469d6fb484",
-      "timestamp": "2026-02-19T03:46:03.250135Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:46:03.144465-05:00 insta-pc sshd[57058]: Failed password for invalid user fake from 127.0.0.1 port 47682 ssh2"
-    },
-    "raw": "2026-02-18T22:46:03.144465-05:00 insta-pc sshd[57058]: Failed password for invalid user fake from 127.0.0.1 port 47682 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "f22cb466-f07f-4273-951b-5a2a508a4a1a",
-      "timestamp": "2026-02-19T03:46:10.252230Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:46:09.830348-05:00 insta-pc sshd[57073]: Failed password for invalid user fake from 127.0.0.1 port 37836 ssh2"
-    },
-    "raw": "2026-02-18T22:46:09.830348-05:00 insta-pc sshd[57073]: Failed password for invalid user fake from 127.0.0.1 port 37836 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "c896a2bc-efb2-4e22-a865-d7f8c811b619",
-      "timestamp": "2026-02-19T03:46:13.253455Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:46:13.019350-05:00 insta-pc sshd[57073]: Failed password for invalid user fake from 127.0.0.1 port 37836 ssh2"
-    },
-    "raw": "2026-02-18T22:46:13.019350-05:00 insta-pc sshd[57073]: Failed password for invalid user fake from 127.0.0.1 port 37836 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "79aed80d-b994-4dfb-83e9-ba339c4e95ea",
-      "timestamp": "2026-02-19T03:50:33.320702Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-18T22:50:33.281085-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-18T22:50:33.281085-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "e38c273b-67bb-4b64-bb26-00c0e177b14d",
-      "timestamp": "2026-02-19T03:52:40.685727Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-18T22:52:40.635882-05:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-18T22:52:40.635882-05:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "b806f393-f917-45be-be6e-6c1230d4c534",
-      "timestamp": "2026-02-19T03:52:46.687709Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-18T22:52:46.494387-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-18T22:52:46.494387-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "9325ee41-8eff-4646-99ad-357d6f11641d",
-      "timestamp": "2026-02-19T03:52:58.691514Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:52:58.470382-05:00 insta-pc sshd[58356]: Failed password for invalid user fake from 127.0.0.1 port 40440 ssh2"
-    },
-    "raw": "2026-02-18T22:52:58.470382-05:00 insta-pc sshd[58356]: Failed password for invalid user fake from 127.0.0.1 port 40440 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "80dc930f-047a-47e2-8556-fa4833590ed9",
-      "timestamp": "2026-02-19T03:53:19.697125Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:53:19.418395-05:00 insta-pc sshd[58356]: Failed password for invalid user fake from 127.0.0.1 port 40440 ssh2"
-    },
-    "raw": "2026-02-18T22:53:19.418395-05:00 insta-pc sshd[58356]: Failed password for invalid user fake from 127.0.0.1 port 40440 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "5638b221-323b-47b6-999f-3451bfa5c7e1",
-      "timestamp": "2026-02-19T03:53:24.699010Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:53:24.480970-05:00 insta-pc sshd[58356]: Failed password for invalid user fake from 127.0.0.1 port 40440 ssh2"
-    },
-    "raw": "2026-02-18T22:53:24.480970-05:00 insta-pc sshd[58356]: Failed password for invalid user fake from 127.0.0.1 port 40440 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "a237c1e8-ab41-4056-9718-05d45632f730",
-      "timestamp": "2026-02-19T03:53:29.700892Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:53:29.534092-05:00 insta-pc sshd[58414]: Failed password for invalid user fake from 127.0.0.1 port 41016 ssh2"
-    },
-    "raw": "2026-02-18T22:53:29.534092-05:00 insta-pc sshd[58414]: Failed password for invalid user fake from 127.0.0.1 port 41016 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "396ac36e-4b93-41ba-b5c2-f55133a7f1d3",
-      "timestamp": "2026-02-19T03:53:33.202508Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fake",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:53:32.811612-05:00 insta-pc sshd[58414]: Failed password for invalid user fake from 127.0.0.1 port 41016 ssh2"
-    },
-    "raw": "2026-02-18T22:53:32.811612-05:00 insta-pc sshd[58414]: Failed password for invalid user fake from 127.0.0.1 port 41016 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "63578751-c637-4c93-8c00-8623ceb61729",
-      "timestamp": "2026-02-19T03:56:26.749954Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-18T22:56:26.458688-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-18T22:56:26.458688-05:00 insta-pc sudo:    insta : TTY=pts/6 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "d0884b6a-a14a-425d-ac3c-5535e427ebe5",
-      "timestamp": "2026-02-19T03:57:27.266437Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:57:27.025240-05:00 insta-pc sshd[59046]: Failed password for invalid user fakeuser from 127.0.0.1 port 52886 ssh2"
-    },
-    "raw": "2026-02-18T22:57:27.025240-05:00 insta-pc sshd[59046]: Failed password for invalid user fakeuser from 127.0.0.1 port 52886 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "4cd5cde5-3308-4128-abf6-2b57a41862d9",
-      "timestamp": "2026-02-19T03:57:36.269428Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:57:35.799382-05:00 insta-pc sshd[59046]: Failed password for invalid user fakeuser from 127.0.0.1 port 52886 ssh2"
-    },
-    "raw": "2026-02-18T22:57:35.799382-05:00 insta-pc sshd[59046]: Failed password for invalid user fakeuser from 127.0.0.1 port 52886 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "0799b222-da0d-4130-b9f7-3a57ee378e56",
-      "timestamp": "2026-02-19T03:57:41.271199Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:57:41.212442-05:00 insta-pc sshd[59046]: Failed password for invalid user fakeuser from 127.0.0.1 port 52886 ssh2"
-    },
-    "raw": "2026-02-18T22:57:41.212442-05:00 insta-pc sshd[59046]: Failed password for invalid user fakeuser from 127.0.0.1 port 52886 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "05f2c6f5-f0a5-4e49-b3b5-9fa64d29dadc",
-      "timestamp": "2026-02-19T03:57:48.273629Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:57:48.270484-05:00 insta-pc sshd[59109]: Failed password for invalid user fakeuser from 127.0.0.1 port 32840 ssh2"
-    },
-    "raw": "2026-02-18T22:57:48.270484-05:00 insta-pc sshd[59109]: Failed password for invalid user fakeuser from 127.0.0.1 port 32840 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "1c5a913d-5a0e-400b-8144-bd8dc91994af",
-      "timestamp": "2026-02-19T03:57:53.275313Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-18T22:57:53.018394-05:00 insta-pc sshd[59109]: Failed password for invalid user fakeuser from 127.0.0.1 port 32840 ssh2"
-    },
-    "raw": "2026-02-18T22:57:53.018394-05:00 insta-pc sshd[59109]: Failed password for invalid user fakeuser from 127.0.0.1 port 32840 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "de97a053-457b-455e-a811-1499058fc6e4",
-      "timestamp": "2026-02-19T23:25:58.227490Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-19T18:25:57.922061-05:00 insta-pc sudo:    insta : TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-19T18:25:57.922061-05:00 insta-pc sudo:    insta : TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "ff9dd89a-2fc0-4b88-9e32-8453baad42bf",
-      "timestamp": "2026-02-19T23:26:32.235376Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-19T18:26:32.182630-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
-    },
-    "raw": "2026-02-19T18:26:32.182630-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "c512777a-7738-4ce8-8b78-ea864aade7fc",
-      "timestamp": "2026-02-19T23:26:37.236488Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-19T18:26:36.908213-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
-    },
-    "raw": "2026-02-19T18:26:36.908213-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "fe3834d7-cd88-4814-b936-5f5bff15e67d",
-      "timestamp": "2026-02-19T23:26:41.237420Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-19T18:26:40.838148-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
-    },
-    "raw": "2026-02-19T18:26:40.838148-05:00 insta-pc sshd[74838]: Failed password for invalid user fakeuser from 127.0.0.1 port 43668 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "0e7a4171-eead-4183-b0ad-fa901029c938",
-      "timestamp": "2026-02-19T23:26:51.239513Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-19T18:26:50.965746-05:00 insta-pc sshd[74855]: Failed password for invalid user fakeuser from 127.0.0.1 port 58178 ssh2"
-    },
-    "raw": "2026-02-19T18:26:50.965746-05:00 insta-pc sshd[74855]: Failed password for invalid user fakeuser from 127.0.0.1 port 58178 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "8fc21493-3a94-4208-886d-5367005bfb87",
-      "timestamp": "2026-02-19T23:26:54.740263Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-19T18:26:54.649695-05:00 insta-pc sshd[74855]: Failed password for invalid user fakeuser from 127.0.0.1 port 58178 ssh2"
-    },
-    "raw": "2026-02-19T18:26:54.649695-05:00 insta-pc sshd[74855]: Failed password for invalid user fakeuser from 127.0.0.1 port 58178 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "826e6d84-899c-4fd5-afe4-4e94986ce72d",
-      "timestamp": "2026-02-20T16:27:35.133787Z",
-      "source": "auth_log",
-      "type": "incorrect_password",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "service": "sudo",
-      "message": "2026-02-20T11:27:35.004766-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-20T11:27:35.004766-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "f34db6f2-557a-4ede-a043-52cf5a2aec1f",
-      "timestamp": "2026-02-20T16:31:45.573017Z",
-      "source": "auth_log",
-      "type": "incorrect_password",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "service": "sudo",
-      "message": "2026-02-20T11:31:45.168637-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-20T11:31:45.168637-05:00 insta-pc sudo:    insta : 1 incorrect password attempt ; TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "10cda241-b1eb-4fe3-9987-d98e5d4b25c0",
-      "timestamp": "2026-02-20T16:32:16.583195Z",
-      "source": "auth_log",
-      "type": "privilege_escalation",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "insta",
-      "command": "/usr/bin/whoami",
-      "service": "sudo",
-      "message": "2026-02-20T11:32:16.222351-05:00 insta-pc sudo:    insta : TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-    },
-    "raw": "2026-02-20T11:32:16.222351-05:00 insta-pc sudo:    insta : TTY=pts/3 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "3202af1e-ec10-4750-b32d-15ec2856352a",
-      "timestamp": "2026-02-20T16:32:46.093427Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-20T11:32:45.693776-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
-    },
-    "raw": "2026-02-20T11:32:45.693776-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "8bcfbdd6-7e1f-4716-8a77-019b01b3435b",
-      "timestamp": "2026-02-20T16:32:50.094979Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-20T11:32:49.972840-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
-    },
-    "raw": "2026-02-20T11:32:49.972840-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "44abd4de-433c-4c66-a37d-7a892dad6e37",
-      "timestamp": "2026-02-20T16:32:53.096273Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-20T11:32:52.864731-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
-    },
-    "raw": "2026-02-20T11:32:52.864731-05:00 insta-pc sshd[143059]: Failed password for invalid user fakeuser from 127.0.0.1 port 39400 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "4e44ec64-3adb-4fac-bb57-08e70608a68b",
-      "timestamp": "2026-02-20T16:32:59.098755Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-20T11:32:58.843825-05:00 insta-pc sshd[143084]: Failed password for invalid user fakeuser from 127.0.0.1 port 45440 ssh2"
-    },
-    "raw": "2026-02-20T11:32:58.843825-05:00 insta-pc sshd[143084]: Failed password for invalid user fakeuser from 127.0.0.1 port 45440 ssh2"
-  },
-  {
-    "agent": {
-      "id": "linux-agent-01",
-      "hostname": "insta-pc",
-      "os": "linux"
-    },
-    "event": {
-      "id": "1275fe3b-500d-4c5e-affd-d9840dd15605",
-      "timestamp": "2026-02-20T16:33:03.600512Z",
-      "source": "auth_log",
-      "type": "authentication_failure",
-      "severity": "medium"
-    },
-    "data": {
-      "user": "fakeuser",
-      "src_ip": "127.0.0.1",
-      "service": "ssh",
-      "message": "2026-02-20T11:33:03.266499-05:00 insta-pc sshd[143084]: Failed password for invalid user fakeuser from 127.0.0.1 port 45440 ssh2"
-    },
-    "raw": "2026-02-20T11:33:03.266499-05:00 insta-pc sshd[143084]: Failed password for invalid user fakeuser from 127.0.0.1 port 45440 ssh2"
-  },
-  {
-    "agent": {
-      "id": "agent-001",
-      "hostname": "insta-pc",
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
       "os": "linux",
-      "ip": "10.132.79.27"
+      "ip": "10.0.0.42"
     },
     "event": {
-      "id": "04adc26e-03be-4f2d-bed6-93b5c24b33ae",
-      "timestamp": "2026-03-25T02:04:41.736Z",
-      "source": "linux_auth_log",
-      "type": "incorrect_password",
+      "id": "17e67047-616c-4a14-8651-3eb846cd0e2e",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
       "severity": "medium"
     },
     "data": {
-      "user": "insta",
-      "service": "sudo",
-      "message": "2026-03-24T22:04:41.492926-04:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami",
-      "src_ip": ""
+      "user": "admin",
+      "src_ip": "203.0.113.9",
+      "service": "ssh",
+      "message": "Failed SSH login attempt #1 for admin"
     },
-    "raw": "2026-03-24T22:04:41.492926-04:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+    "raw": "sshd: Failed password for admin from 203.0.113.9 attempt 1",
+    "event_id": "17e67047-616c-4a14-8651-3eb846cd0e2e"
   },
   {
     "agent": {
-      "id": "agent-001",
-      "hostname": "insta-pc",
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
       "os": "linux",
-      "ip": "10.132.79.27"
+      "ip": "10.0.0.42"
     },
     "event": {
-      "id": "56edaa25-1bd7-4c79-bb63-4dd354042b09",
-      "timestamp": "2026-03-25T02:04:51.738Z",
-      "source": "linux_auth_log",
-      "type": "incorrect_password",
+      "id": "f07aab56-5385-41f4-a0fd-ce692ea8674e",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
       "severity": "medium"
     },
     "data": {
-      "user": "insta",
-      "service": "sudo",
-      "message": "2026-03-24T22:04:51.400692-04:00 insta-pc sudo: pam_unix(sudo:auth): authentication failure; logname= uid=1000 euid=0 tty=/dev/pts/4 ruser=insta rhost=  user=insta",
-      "src_ip": ""
+      "user": "admin",
+      "src_ip": "203.0.113.9",
+      "service": "ssh",
+      "message": "Failed SSH login attempt #2 for admin"
     },
-    "raw": "2026-03-24T22:04:51.400692-04:00 insta-pc sudo: pam_unix(sudo:auth): authentication failure; logname= uid=1000 euid=0 tty=/dev/pts/4 ruser=insta rhost=  user=insta"
+    "raw": "sshd: Failed password for admin from 203.0.113.9 attempt 2",
+    "event_id": "f07aab56-5385-41f4-a0fd-ce692ea8674e"
   },
   {
     "agent": {
-      "id": "agent-001",
-      "hostname": "insta-pc",
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
       "os": "linux",
-      "ip": "10.132.79.27"
+      "ip": "10.0.0.42"
     },
     "event": {
-      "id": "5aeffa88-669d-44a0-bf3e-fdeba9edd348",
-      "timestamp": "2026-03-25T02:04:59.240Z",
-      "source": "linux_auth_log",
+      "id": "fe8243e8-d580-41ea-9e41-10cedae7794a",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "admin",
+      "src_ip": "203.0.113.9",
+      "service": "ssh",
+      "message": "Failed SSH login attempt #3 for admin"
+    },
+    "raw": "sshd: Failed password for admin from 203.0.113.9 attempt 3",
+    "event_id": "fe8243e8-d580-41ea-9e41-10cedae7794a"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "13007bcf-f5ce-44ac-b2da-e80903764917",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "admin",
+      "src_ip": "203.0.113.9",
+      "service": "ssh",
+      "message": "Failed SSH login attempt #4 for admin"
+    },
+    "raw": "sshd: Failed password for admin from 203.0.113.9 attempt 4",
+    "event_id": "13007bcf-f5ce-44ac-b2da-e80903764917"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "87ebf031-3277-4a33-be25-51407e866f99",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "admin",
+      "src_ip": "203.0.113.9",
+      "service": "ssh",
+      "message": "Failed SSH login attempt #5 for admin"
+    },
+    "raw": "sshd: Failed password for admin from 203.0.113.9 attempt 5",
+    "event_id": "87ebf031-3277-4a33-be25-51407e866f99"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "f4b4a8e4-146a-460f-a9b0-88db70367b14",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "admin",
+      "src_ip": "203.0.113.9",
+      "service": "ssh",
+      "message": "Failed SSH login attempt #6 for admin"
+    },
+    "raw": "sshd: Failed password for admin from 203.0.113.9 attempt 6",
+    "event_id": "f4b4a8e4-146a-460f-a9b0-88db70367b14"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "4bf42a8b-7a97-4c42-9c51-9f4748eed4cb",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "alice",
+      "src_ip": "198.51.100.55",
+      "service": "ssh",
+      "message": "Credential spray attempt for alice"
+    },
+    "raw": "sshd: Failed password for invalid user alice from 198.51.100.55",
+    "event_id": "4bf42a8b-7a97-4c42-9c51-9f4748eed4cb"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "cb43c024-37b1-4c04-ae26-5b16afd83f98",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "bob",
+      "src_ip": "198.51.100.55",
+      "service": "ssh",
+      "message": "Credential spray attempt for bob"
+    },
+    "raw": "sshd: Failed password for invalid user bob from 198.51.100.55",
+    "event_id": "cb43c024-37b1-4c04-ae26-5b16afd83f98"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "4e83ce70-8127-4c6c-9595-a2d9f395c2ae",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "carol",
+      "src_ip": "198.51.100.55",
+      "service": "ssh",
+      "message": "Credential spray attempt for carol"
+    },
+    "raw": "sshd: Failed password for invalid user carol from 198.51.100.55",
+    "event_id": "4e83ce70-8127-4c6c-9595-a2d9f395c2ae"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "cee5416b-61ae-4c14-8419-e3e09325f958",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "dave",
+      "src_ip": "198.51.100.55",
+      "service": "ssh",
+      "message": "Credential spray attempt for dave"
+    },
+    "raw": "sshd: Failed password for invalid user dave from 198.51.100.55",
+    "event_id": "cee5416b-61ae-4c14-8419-e3e09325f958"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "2f254927-f325-4d45-92d3-50a5850ae816",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "erin",
+      "src_ip": "198.51.100.55",
+      "service": "ssh",
+      "message": "Credential spray attempt for erin"
+    },
+    "raw": "sshd: Failed password for invalid user erin from 198.51.100.55",
+    "event_id": "2f254927-f325-4d45-92d3-50a5850ae816"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "739030c2-a3ba-49e2-8722-80cfae8556c1",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "successful_login",
+      "severity": "low"
+    },
+    "data": {
+      "user": "jane",
+      "src_ip": "192.0.2.44",
+      "service": "ssh",
+      "message": "Successful login for jane from known location"
+    },
+    "raw": "sshd: Accepted password for jane from 192.0.2.44",
+    "event_id": "739030c2-a3ba-49e2-8722-80cfae8556c1"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "e27e4c5f-111f-48b0-98b6-1d1492a80562",
+      "timestamp": "2026-04-29T23:30:00Z",
+      "source": "demo_seed",
+      "type": "successful_login",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "jane",
+      "src_ip": "198.51.100.99",
+      "service": "ssh",
+      "message": "Successful login for jane from new location"
+    },
+    "raw": "sshd: Accepted password for jane from 198.51.100.99",
+    "event_id": "e27e4c5f-111f-48b0-98b6-1d1492a80562"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "e69b551d-baa6-499c-8e68-6fd0a7741193",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "privilege_escalation",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "ops-user",
+      "src_ip": "",
+      "service": "sudo",
+      "command": "/usr/bin/systemctl restart nginx",
+      "message": "Sudo invocation #1 by ops-user"
+    },
+    "raw": "sudo: ops-user executed privileged command #1",
+    "event_id": "e69b551d-baa6-499c-8e68-6fd0a7741193"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "3c5484fb-610e-4ae4-93dd-5774687ec4ce",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "privilege_escalation",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "ops-user",
+      "src_ip": "",
+      "service": "sudo",
+      "command": "/usr/bin/systemctl restart nginx",
+      "message": "Sudo invocation #2 by ops-user"
+    },
+    "raw": "sudo: ops-user executed privileged command #2",
+    "event_id": "3c5484fb-610e-4ae4-93dd-5774687ec4ce"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "76608c61-37f2-43dd-af1d-87dd791514a4",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "privilege_escalation",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "ops-user",
+      "src_ip": "",
+      "service": "sudo",
+      "command": "/usr/bin/systemctl restart nginx",
+      "message": "Sudo invocation #3 by ops-user"
+    },
+    "raw": "sudo: ops-user executed privileged command #3",
+    "event_id": "76608c61-37f2-43dd-af1d-87dd791514a4"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "b0a582e1-9cad-4115-befa-6cfb764d0c7f",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "privilege_escalation",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "ops-user",
+      "src_ip": "",
+      "service": "sudo",
+      "command": "/usr/bin/systemctl restart nginx",
+      "message": "Sudo invocation #4 by ops-user"
+    },
+    "raw": "sudo: ops-user executed privileged command #4",
+    "event_id": "b0a582e1-9cad-4115-befa-6cfb764d0c7f"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "ad6ec04d-2c91-40a8-830d-76d1ec5bd94a",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "privilege_escalation",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "ops-user",
+      "src_ip": "",
+      "service": "sudo",
+      "command": "/usr/bin/systemctl restart nginx",
+      "message": "Sudo invocation #5 by ops-user"
+    },
+    "raw": "sudo: ops-user executed privileged command #5",
+    "event_id": "ad6ec04d-2c91-40a8-830d-76d1ec5bd94a"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "f0846bc1-393a-4a38-bab3-d4a76440dc8b",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
+      "type": "privilege_escalation",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "ops-user",
+      "src_ip": "",
+      "service": "sudo",
+      "command": "/usr/bin/systemctl restart nginx",
+      "message": "Sudo invocation #6 by ops-user"
+    },
+    "raw": "sudo: ops-user executed privileged command #6",
+    "event_id": "f0846bc1-393a-4a38-bab3-d4a76440dc8b"
+  },
+  {
+    "agent": {
+      "id": "demo-agent-001",
+      "hostname": "demo-host",
+      "os": "linux",
+      "ip": "10.0.0.42"
+    },
+    "event": {
+      "id": "93578d6e-d569-4f41-b546-0101638ddd60",
+      "timestamp": "2026-04-29T17:25:13.492Z",
+      "source": "demo_seed",
       "type": "incorrect_password",
       "severity": "medium"
     },
     "data": {
-      "user": "insta",
+      "user": "ops-user",
+      "src_ip": "",
       "service": "sudo",
-      "message": "2026-03-24T22:04:59.091650-04:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami",
-      "src_ip": ""
+      "message": "Incorrect sudo password entered"
     },
-    "raw": "2026-03-24T22:04:59.091650-04:00 insta-pc sudo:    insta : 3 incorrect password attempts ; TTY=pts/4 ; PWD=/home/insta ; USER=root ; COMMAND=/usr/bin/whoami"
+    "raw": "sudo: 1 incorrect password attempt",
+    "event_id": "93578d6e-d569-4f41-b546-0101638ddd60"
   }
 ]

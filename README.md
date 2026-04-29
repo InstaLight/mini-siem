@@ -92,6 +92,7 @@ python3 -m agent.main --config agent/config.json
 make server    # socket ingest
 make web-ui    # FastAPI
 make agent     # agent with default config path (adjust Makefile if needed)
+make seed-demo # push varied dummy events to receiver for demos
 make install-startup   # install OS-login startup for agent (macOS/Linux)
 make uninstall-startup # remove OS-login startup service
 ```
@@ -154,11 +155,36 @@ Optional extra keys (e.g. `command` for sudo) are allowed. Use `make_event()` so
 
 The dashboard at `/` now includes:
 
+- A summary-first layout for non-technical audiences
+- Plain-language warnings/activity labels
 - Alerts + events views with bulk checkbox selection
 - **Clear selected** for alerts and events independently
 - Combined CSV export (`/export/combined.csv`)
 - Response action controls (with dry-run enabled by default)
 - Action audit history panel
+
+## Demo data seeding
+
+For demonstrations, seed realistic mixed activity directly through the normal TCP ingest path:
+
+```bash
+make seed-demo
+```
+
+Or run manually with options:
+
+```bash
+python3 scripts/seed_demo_data.py --host 127.0.0.1 --port 9001 --burst-multiplier 2
+```
+
+This generates varied event types to trigger multiple detectors:
+
+- repeated auth failures (SSH brute-force signal),
+- distributed username spray from one IP,
+- successful login from a new IP,
+- successful login during suspicious UTC hours,
+- repeated privilege escalation (sudo abuse),
+- incorrect password samples.
 
 ## Response action safety model (MVP)
 
@@ -205,10 +231,14 @@ Environment overrides (optional):
 
 1. Start receiver: `make server`
 2. Start web API/dashboard: `make web-ui`
-3. Start agent on endpoint: `make agent` (or direct `python -m agent.main ...`)
+3. Seed demonstration data: `make seed-demo`
 4. Open dashboard: [http://localhost:8000](http://localhost:8000)
-5. Verify:
-   - events and alerts populate,
+5. Walk non-technical viewers through:
+   - top summary cards (overall activity and risk),
+   - **Warnings** tab (human-readable warning list),
+   - **Activity Log** tab (underlying event stream),
+   - **Response History** (what response steps were run).
+6. Verify interactive features:
    - select rows and run **clear selected** in each tab,
    - export CSV and inspect both `record_kind=event` and `record_kind=alert` rows,
    - execute a dry-run response action and confirm it appears in action history.

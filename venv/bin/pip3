@@ -1,4 +1,4 @@
-#!/home/insta/mini-siem/venv/bin/python3
+#!/Users/patricksmith/Documents/GitHub/mini-siem/venv/bin/python
 # -*- coding: utf-8 -*-
 import re
 import sys

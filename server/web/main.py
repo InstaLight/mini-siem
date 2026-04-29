@@ -33,6 +33,52 @@ class ActionRequest(BaseModel):
     requested_by: str = "dashboard"
 
 
+SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2}
+
+
+def _selected_severities(request: Request) -> list[str]:
+    requested = [s.lower() for s in request.query_params.getlist("severity")]
+    normalized = [s for s in requested if s in SEVERITY_ORDER]
+    return sorted(set(normalized), key=lambda s: SEVERITY_ORDER[s])
+
+
+def _issues_view(request: Request) -> str:
+    view = (request.query_params.get("view") or "warnings").lower()
+    return view if view in {"warnings", "activity"} else "warnings"
+
+
+def _admin_view(request: Request) -> str:
+    view = (request.query_params.get("view") or "warnings").lower()
+    return view if view in {"warnings", "activity"} else "warnings"
+
+
+def _filter_alerts_and_events(
+    alerts: list[dict[str, Any]],
+    events: list[dict[str, Any]],
+    selected: list[str],
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    if not selected:
+        filtered_alerts = alerts
+        filtered_events = events
+    else:
+        selected_set = set(selected)
+        filtered_alerts = [a for a in alerts if str(a.get("severity", "")).lower() in selected_set]
+        filtered_events = [e for e in events if str(e.get("event", {}).get("severity", "")).lower() in selected_set]
+
+    def _alert_sort_key(alert: dict[str, Any]) -> tuple[int, str]:
+        sev = str(alert.get("severity", "")).lower()
+        return (SEVERITY_ORDER.get(sev, 99), str(alert.get("timestamp", "")))
+
+    def _event_sort_key(event: dict[str, Any]) -> tuple[int, str]:
+        sev = str(event.get("event", {}).get("severity", "")).lower()
+        ts = str(event.get("event", {}).get("timestamp", ""))
+        return (SEVERITY_ORDER.get(sev, 99), ts)
+
+    filtered_alerts = sorted(filtered_alerts, key=_alert_sort_key)
+    filtered_events = sorted(filtered_events, key=_event_sort_key)
+    return filtered_alerts, filtered_events
+
+
 def _enriched_events() -> list[dict[str, Any]]:
     events = load_json_list(EVENTS_FILE)
     for idx, event in enumerate(events):
@@ -69,8 +115,8 @@ def get_alerts():
     return _enriched_alerts()
 
 
-@app.get("/actions")
-def list_actions():
+@app.get("/api/actions")
+def list_actions_api():
     return get_actions()
 
 
@@ -187,23 +233,95 @@ def export_combined_csv():
 
 
 @app.get("/", response_class=HTMLResponse)
-def dashboard(request: Request):
+@app.get("/health", response_class=HTMLResponse)
+def health_page(request: Request):
     alerts = _enriched_alerts()
     events = _enriched_events()
-    actions = get_actions()
+    actions = get_actions()[-20:][::-1]
     sev_counts = {"low": 0, "medium": 0, "high": 0}
     for alert in alerts:
         sev = str(alert.get("severity", "")).lower()
         if sev in sev_counts:
             sev_counts[sev] += 1
+    latest_event = max((e.get("event", {}).get("timestamp", "") for e in events), default="")
+    latest_alert = max((a.get("timestamp", "") for a in alerts), default="")
+    latest_activity = max(latest_event, latest_alert) if (latest_event or latest_alert) else "No recent activity"
+    summary = {
+        "total_activity": len(events),
+        "total_warnings": len(alerts),
+        "high_priority": sev_counts["high"],
+        "latest_activity": latest_activity,
+    }
     return templates.TemplateResponse(
-        "dashboard.html",
-        {
+        request=request,
+        name="health.html",
+        context={
             "request": request,
+            "nav_current": "health",
             "alerts": alerts,
             "events": events,
-            "actions": actions[-20:][::-1],
+            "actions": actions,
             "severity_counts": sev_counts,
+            "summary": summary,
+            "allowed_actions": sorted(ALLOWED_ACTIONS),
+        },
+    )
+
+
+@app.get("/issues", response_class=HTMLResponse)
+def issues_page(request: Request):
+    alerts = _enriched_alerts()
+    events = _enriched_events()
+    selected = _selected_severities(request)
+    current_view = _issues_view(request)
+    alerts, events = _filter_alerts_and_events(alerts, events, selected)
+    return templates.TemplateResponse(
+        request=request,
+        name="issues.html",
+        context={
+            "request": request,
+            "nav_current": "issues",
+            "issues_view": current_view,
+            "alerts": alerts,
+            "events": events[-25:][::-1],
+            "selected_severities": selected,
+        },
+    )
+
+
+@app.get("/actions", response_class=HTMLResponse)
+def actions_page(request: Request):
+    actions = get_actions()[-50:][::-1]
+    return templates.TemplateResponse(
+        request=request,
+        name="actions.html",
+        context={
+            "request": request,
+            "nav_current": "actions",
+            "actions": actions,
+        },
+    )
+
+
+@app.get("/admin", response_class=HTMLResponse)
+def admin_page(request: Request):
+    alerts = _enriched_alerts()
+    events = _enriched_events()
+    selected = _selected_severities(request)
+    current_view = _admin_view(request)
+    alerts, events = _filter_alerts_and_events(alerts, events, selected)
+    actions = get_actions()[-20:][::-1]
+    return templates.TemplateResponse(
+        request=request,
+        name="admin.html",
+        context={
+            "request": request,
+            "nav_current": "admin",
+            "admin_view": current_view,
+            "alerts": alerts,
+            "events": events,
+            "actions": actions,
+            "selected_severities": selected,
             "allowed_actions": sorted(ALLOWED_ACTIONS),
         },
     )

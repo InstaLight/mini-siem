@@ -1,4 +1,4 @@
-.PHONY: server agent web-ui install-startup uninstall-startup
+.PHONY: server agent web-ui install-startup uninstall-startup seed-demo
 
 server:
 	@echo "Starting SIEM server..."
@@ -19,3 +19,7 @@ install-startup:
 uninstall-startup:
 	@echo "Removing OS-login startup service for agent..."
 	./scripts/uninstall_startup.sh
+
+seed-demo:
+	@echo "Seeding demo events into receiver..."
+	python3 scripts/seed_demo_data.py --host 127.0.0.1 --port 9001

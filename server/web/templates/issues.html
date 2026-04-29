@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Security Issues</title>
+    <style>
+        body { font-family: Arial, sans-serif; background: #0f1116; color: #e9eef8; margin: 0; line-height: 1.4; }
+        .container { max-width: 980px; margin: 0 auto; padding: 1rem; }
+        .topnav { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
+        .topnav a { text-decoration: none; color: #d8e2f7; padding: 0.55rem 0.8rem; border: 1px solid #33415d; border-radius: 8px; font-size: 0.95rem; }
+        .topnav a.active { background: #26324a; }
+        .subtitle { color: #b3c0da; margin: 0.3rem 0 1rem; }
+        .subnav { display: flex; gap: 0.5rem; margin: 0.4rem 0 0.8rem; }
+        .subnav a { text-decoration: none; color: #d8e2f7; padding: 0.45rem 0.7rem; border: 1px solid #33415d; border-radius: 8px; font-size: 0.9rem; }
+        .subnav a.active { background: #26324a; }
+        .toolbar { margin-bottom: 0.8rem; display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center; }
+        button { background: #1f2735; color: #e9eef8; border: 1px solid #3a455e; border-radius: 8px; padding: 0.55rem 0.75rem; }
+        .filterBox { border: 1px solid #2f3a50; background: #141a26; border-radius: 8px; padding: 0.55rem 0.7rem; display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; margin-bottom: 0.8rem; }
+        .filterBox label { font-size: 0.9rem; color: #c6d2ea; }
+        .cards { display: grid; grid-template-columns: 1fr; gap: 0.7rem; }
+        .card { background: #171d2a; border: 1px solid #313d56; border-radius: 10px; padding: 0.75rem; }
+        .alertCard { border-left: 3px solid #b18a3f; }
+        .eventCard { border-left: 3px solid #3f6fb1; }
+        .chip { display: inline-block; background: #22314d; border-radius: 999px; padding: 0.2rem 0.55rem; margin-right: 0.4rem; font-size: 0.82rem; color: #d1ddf6; }
+        .chipWarn { background: #3e341f; color: #f1d49b; }
+        .chipHigh { background: #462727; color: #f2b1b1; }
+        .muted { color: #aab6cf; }
+        .banner { margin: 0.5rem 0 0.8rem; padding: 0.6rem 0.7rem; border-radius: 8px; display: none; }
+        .banner.show { display: block; }
+        .banner.ok { background: #11331d; border: 1px solid #2f6f46; color: #9fe0b4; }
+        .banner.err { background: #3a1717; border: 1px solid #7b2d2d; color: #f3b2b2; }
+        @media (min-width: 760px) { .cards { grid-template-columns: 1fr 1fr; } }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="topnav">
+            <a href="/health">Health</a>
+            <a class="active" href="/issues">Issues</a>
+            <a href="/actions">Actions</a>
+            <a href="/admin">Admin</a>
+        </div>
+        <h1>Security Issues</h1>
+        <p class="subtitle">Review current warnings and clear items once they are handled.</p>
+        <div id="banner" class="banner"></div>
+        <div class="subnav">
+            <a class="{% if issues_view == 'warnings' %}active{% endif %}" href="/issues?view=warnings{% for sev in selected_severities %}&severity={{ sev }}{% endfor %}">Warnings</a>
+            <a class="{% if issues_view == 'activity' %}active{% endif %}" href="/issues?view=activity{% for sev in selected_severities %}&severity={{ sev }}{% endfor %}">Activity</a>
+        </div>
+        <form method="get" action="/issues" class="filterBox">
+            <input type="hidden" name="view" value="{{ issues_view }}"/>
+            <strong>Severity Filter:</strong>
+            <label><input class="severity-filter" type="checkbox" name="severity" value="low" {% if "low" in selected_severities %}checked{% endif %}/> Low</label>
+            <label><input class="severity-filter" type="checkbox" name="severity" value="medium" {% if "medium" in selected_severities %}checked{% endif %}/> Medium</label>
+            <label><input class="severity-filter" type="checkbox" name="severity" value="high" {% if "high" in selected_severities %}checked{% endif %}/> High</label>
+            <span class="muted">
+                {% if selected_severities|length > 0 %}
+                Showing: {{ selected_severities|join(", ")|title }}
+                {% else %}
+                Showing: all severities
+                {% endif %}
+            </span>
+        </form>
+
+        {% if issues_view == "warnings" %}
+        <div class="toolbar">
+            <button onclick="selectAll('alert-row')">Select All Warnings</button>
+            <button onclick="clearSelectedAlerts()">Clear Selected Warnings</button>
+            <span class="muted">Selected: <span id="selected-count">0</span> | Total warnings: {{ alerts|length }}</span>
+        </div>
+        <div class="cards">
+            {% for alert in alerts %}
+            <div class="card alertCard">
+                <div><input type="checkbox" class="alert-row" value="{{ alert.alert_id }}" onchange="updateCount()"/> <strong>{{ alert.alert_type|replace("_", " ")|title }}</strong></div>
+                <div style="margin:0.4rem 0;">
+                    <span class="chip {% if alert.severity|lower == 'high' %}chipHigh{% else %}chipWarn{% endif %}">Priority: {{ alert.severity|title }}</span>
+                    <span class="chip">User: {{ alert.username or "-" }}</span>
+                </div>
+                <div class="muted">Device: {{ alert.client_id or "-" }}</div>
+                <div class="muted">Time: {{ alert.timestamp }}</div>
+                <div>{{ alert.message or "-" }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if alerts|length == 0 %}
+        <p class="muted">No security issues are currently listed.</p>
+        {% endif %}
+        {% endif %}
+
+        {% if issues_view == "activity" %}
+        <h2 id="recent-activity">Recent Activity (Read Only)</h2>
+        <div class="cards">
+            {% for event in events %}
+            <div class="card eventCard">
+                <strong>{{ event.event.type|replace("_", " ")|title }}</strong>
+                <div style="margin:0.4rem 0;">
+                    <span class="chip">Priority: {{ event.event.severity|title }}</span>
+                    <span class="chip">User: {{ event.data.user or "-" }}</span>
+                </div>
+                <div class="muted">Device: {{ event.agent.id or "-" }}</div>
+                <div class="muted">Time: {{ event.event.timestamp }}</div>
+                <div>{{ event.data.message or "-" }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% if events|length == 0 %}
+        <p class="muted">No activity records match the selected severity filters.</p>
+        {% endif %}
+        {% endif %}
+    </div>
+    <script>
+        function showBanner(message, isError=false) {
+            const el = document.getElementById("banner");
+            el.textContent = message;
+            el.className = "banner show " + (isError ? "err" : "ok");
+        }
+        function updateCount() {
+            document.getElementById("selected-count").textContent = selectedIds("alert-row").length;
+        }
+        function selectedIds(className) {
+            return Array.from(document.querySelectorAll("." + className + ":checked")).map(x => x.value);
+        }
+        function selectAll(className) {
+            document.querySelectorAll("." + className).forEach(x => x.checked = true);
+            updateCount();
+        }
+        async function postJson(path, payload) {
+            const res = await fetch(path, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                throw new Error(await res.text());
+            }
+            return res.json();
+        }
+        async function clearSelectedAlerts() {
+            const ids = selectedIds("alert-row");
+            if (!ids.length) return showBanner("Select at least one warning first.", true);
+            await postJson("/alerts/clear-selected", {ids});
+            showBanner("Selected warnings cleared.");
+            window.location.reload();
+        }
+        document.querySelectorAll(".severity-filter").forEach((el) => {
+            el.addEventListener("change", () => {
+                el.form.submit();
+            });
+        });
+    </script>
+</body>
+</html>
