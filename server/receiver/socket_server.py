@@ -37,9 +37,7 @@ def handle_client(conn, addr):
                     continue
 
                 try:
-                    print("[DEBUG RAW LINE]:", repr(line))
                     event = json.loads(line)
-                    print("[DEBUG] EVENT RECIEVED:", event)
 
                     # Validate schema
                     validate_event(event)
@@ -55,7 +53,7 @@ def handle_client(conn, addr):
                         store_alert(alert)
 
                 except json.JSONDecodeError:
-                    print("[!] Invalid JSON received")
+                    print("[!] Invalid JSON payload received from agent")
                 except Exception as e:
                     print(f"[!] Error processing event: {e}")
 

@@ -3,37 +3,166 @@
 <head>
     <title>Mini-SIEM Dashboard</title>
     <style>
-        body { font-family: Arial; background: #111; color: #eee; }
-        table { border-collapse: collapse; width: 100%; }
-        th, td { border: 1px solid #444; padding: 8px; }
-        th { background-color: #222; }
-        tr:nth-child(even) { background-color: #1a1a1a; }
+        body { font-family: Arial, sans-serif; background: #0f1116; color: #e9eef8; margin: 0; }
+        .container { max-width: 1200px; margin: 0 auto; padding: 1rem; }
+        .header { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; }
+        .cards { display: grid; grid-template-columns: repeat(5, minmax(120px, 1fr)); gap: 0.75rem; margin: 1rem 0; }
+        .card { background: #171b26; border: 1px solid #2a3142; border-radius: 8px; padding: 0.8rem; }
+        .tabs { display: flex; gap: 0.5rem; margin-bottom: 0.8rem; }
+        button, select { background: #1f2735; color: #e9eef8; border: 1px solid #3a455e; border-radius: 6px; padding: 0.4rem 0.6rem; }
+        button:hover { background: #2a3347; cursor: pointer; }
+        .panel { display: none; }
+        .panel.active { display: block; }
+        .toolbar { margin-bottom: 0.7rem; display: flex; gap: 0.6rem; flex-wrap: wrap; align-items: center; }
+        table { border-collapse: collapse; width: 100%; font-size: 0.92rem; }
+        th, td { border: 1px solid #303a4f; padding: 6px; text-align: left; }
+        th { background: #1b2331; position: sticky; top: 0; }
+        tr:nth-child(2n) { background: #141a25; }
+        .muted { color: #aab6cf; }
+        .actions-log { max-height: 260px; overflow: auto; border: 1px solid #303a4f; border-radius: 8px; }
+        .row { padding: 0.5rem; border-bottom: 1px solid #2b3448; }
     </style>
 </head>
 <body>
-    <h1>Security Alerts</h1>
-    <form action="/alerts/clear" method="post" style="margin-bottom: 1rem;">
-        <button type="submit">Clear Alerts</button>
-    </form>
+    <div class="container">
+        <div class="header">
+            <h1>Mini-SIEM Dashboard</h1>
+            <div>
+                <a href="/export/combined.csv"><button type="button">Export Combined CSV</button></a>
+            </div>
+        </div>
+        <div class="cards">
+            <div class="card"><div class="muted">Alerts</div><div>{{ alerts|length }}</div></div>
+            <div class="card"><div class="muted">Events</div><div>{{ events|length }}</div></div>
+            <div class="card"><div class="muted">Low</div><div>{{ severity_counts.low }}</div></div>
+            <div class="card"><div class="muted">Medium</div><div>{{ severity_counts.medium }}</div></div>
+            <div class="card"><div class="muted">High</div><div>{{ severity_counts.high }}</div></div>
+        </div>
 
-    <table>
-        <tr>
-            <th>Type</th>
-            <th>Severity</th>
-            <th>User</th>
-            <th>Client ID</th>
-            <th>Timestamp</th>
-        </tr>
-        {% for alert in alerts %}
-        <tr>
-            <td>{{ alert.alert_type }}</td>
-            <td>{{ alert.severity }}</td>
-            <td>{{ alert.username or alert.src_ip or '-' }}</td>
-            <td>{{ alert.client_id or '-' }}</td>
-            <td>{{ alert.timestamp }}</td>
-        </tr>
-        {% endfor %}
-    </table>
+        <div class="tabs">
+            <button onclick="showPanel('alerts')">Alerts</button>
+            <button onclick="showPanel('events')">Events</button>
+        </div>
+
+        <div id="alerts-panel" class="panel active">
+            <div class="toolbar">
+                <button onclick="selectAll('alert-row')">Select all</button>
+                <button onclick="clearSelectedAlerts()">Clear selected alerts</button>
+                <select id="alert-action-type">
+                    {% for action in allowed_actions %}
+                    <option value="{{ action }}">{{ action }}</option>
+                    {% endfor %}
+                </select>
+                <label><input id="alert-dry-run" type="checkbox" checked/> Dry run</label>
+                <button onclick="runActionOnSelected('alert-row')">Run action on selected</button>
+            </div>
+            <table>
+                <tr>
+                    <th></th><th>Type</th><th>Severity</th><th>User</th><th>Client</th><th>Timestamp</th><th>Message</th>
+                </tr>
+                {% for alert in alerts %}
+                <tr>
+                    <td><input type="checkbox" class="alert-row" value="{{ alert.alert_id }}"/></td>
+                    <td>{{ alert.alert_type }}</td>
+                    <td>{{ alert.severity }}</td>
+                    <td>{{ alert.username or "-" }}</td>
+                    <td>{{ alert.client_id or "-" }}</td>
+                    <td>{{ alert.timestamp }}</td>
+                    <td>{{ alert.message or "-" }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <div id="events-panel" class="panel">
+            <div class="toolbar">
+                <button onclick="selectAll('event-row')">Select all</button>
+                <button onclick="clearSelectedEvents()">Clear selected events</button>
+                <select id="event-action-type">
+                    {% for action in allowed_actions %}
+                    <option value="{{ action }}">{{ action }}</option>
+                    {% endfor %}
+                </select>
+                <label><input id="event-dry-run" type="checkbox" checked/> Dry run</label>
+                <button onclick="runActionOnSelected('event-row')">Run action on selected</button>
+            </div>
+            <table>
+                <tr>
+                    <th></th><th>Type</th><th>Severity</th><th>User</th><th>Agent</th><th>Timestamp</th><th>Message</th>
+                </tr>
+                {% for event in events %}
+                <tr>
+                    <td><input type="checkbox" class="event-row" value="{{ event.event_id }}"/></td>
+                    <td>{{ event.event.type }}</td>
+                    <td>{{ event.event.severity }}</td>
+                    <td>{{ event.data.user or "-" }}</td>
+                    <td>{{ event.agent.id or "-" }}</td>
+                    <td>{{ event.event.timestamp }}</td>
+                    <td>{{ event.data.message or "-" }}</td>
+                </tr>
+                {% endfor %}
+            </table>
+        </div>
+
+        <h2>Action History</h2>
+        <div class="actions-log">
+            {% for action in actions %}
+            <div class="row">
+                <strong>{{ action.action_type }}</strong> - {{ action.status }} - {{ action.requested_at }}
+                <div class="muted">targets={{ action.target_ids|length }}, dry_run={{ action.dry_run }}</div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <script>
+        function showPanel(panel) {
+            document.getElementById("alerts-panel").classList.remove("active");
+            document.getElementById("events-panel").classList.remove("active");
+            document.getElementById(panel + "-panel").classList.add("active");
+        }
+        function selectedIds(className) {
+            return Array.from(document.querySelectorAll("." + className + ":checked")).map(x => x.value);
+        }
+        function selectAll(className) {
+            document.querySelectorAll("." + className).forEach(x => x.checked = true);
+        }
+        async function postJson(path, payload) {
+            const res = await fetch(path, {
+                method: "POST",
+                headers: {"Content-Type": "application/json"},
+                body: JSON.stringify(payload)
+            });
+            if (!res.ok) {
+                const t = await res.text();
+                throw new Error(t);
+            }
+            return res.json();
+        }
+        async function clearSelectedAlerts() {
+            const ids = selectedIds("alert-row");
+            await postJson("/alerts/clear-selected", {ids});
+            window.location.reload();
+        }
+        async function clearSelectedEvents() {
+            const ids = selectedIds("event-row");
+            await postJson("/events/clear-selected", {ids});
+            window.location.reload();
+        }
+        async function runActionOnSelected(className) {
+            const ids = selectedIds(className);
+            const isAlert = className === "alert-row";
+            const actionType = document.getElementById(isAlert ? "alert-action-type" : "event-action-type").value;
+            const dryRun = document.getElementById(isAlert ? "alert-dry-run" : "event-dry-run").checked;
+            await postJson("/actions/execute", {
+                action_type: actionType,
+                target_ids: ids,
+                dry_run: dryRun,
+                requested_by: "dashboard"
+            });
+            window.location.reload();
+        }
+    </script>
 
 </body>
 </html>

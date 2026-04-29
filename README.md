@@ -92,6 +92,8 @@ python3 -m agent.main --config agent/config.json
 make server    # socket ingest
 make web-ui    # FastAPI
 make agent     # agent with default config path (adjust Makefile if needed)
+make install-startup   # install OS-login startup for agent (macOS/Linux)
+make uninstall-startup # remove OS-login startup service
 ```
 
 ## How detection works
@@ -147,6 +149,69 @@ Optional extra keys (e.g. `command` for sudo) are allowed. Use `make_event()` so
 - **Reconnect:** The agent reconnects in a loop if the TCP session drops (`reconnect_delay_seconds` in config).
 - **Clear alerts:** `POST /alerts/clear` (demo button on the dashboard) wipes `alerts.json`.
 - **Windows:** First connection skips existing Security log backlog; only **new** records are forwarded.
+
+## Real dashboard features
+
+The dashboard at `/` now includes:
+
+- Alerts + events views with bulk checkbox selection
+- **Clear selected** for alerts and events independently
+- Combined CSV export (`/export/combined.csv`)
+- Response action controls (with dry-run enabled by default)
+- Action audit history panel
+
+## Response action safety model (MVP)
+
+- Allowed action types are explicitly allowlisted (`terminate_process`, `isolate_host`).
+- Destructive actions default to `dry_run=true`.
+- Every action request is recorded with:
+  - action ID, requester, timestamps
+  - targeted IDs
+  - status + execution details
+- `terminate_process` currently executes only on the local server host (PID-based MVP path).
+- `isolate_host` is a placeholder response for future remote agent integration.
+
+## OS-login startup automation
+
+Install/remove startup services:
+
+```bash
+make install-startup
+make uninstall-startup
+```
+
+Under the hood:
+
+- **macOS:** installs `~/Library/LaunchAgents/com.mini-siem.agent.plist`
+- **Linux:** installs `~/.config/systemd/user/mini-siem-agent.service`
+
+Environment overrides (optional):
+
+- `PYTHON_BIN` (default: `./venv/bin/python3`)
+- `CONFIG_PATH` (default: `./agent/config.json`)
+
+## API additions (final version)
+
+- `GET /events` - returns enriched events (includes `event_id`)
+- `GET /alerts` - returns enriched alerts (includes `alert_id`)
+- `POST /events/clear-selected` - bulk clear selected events by `ids`
+- `POST /alerts/clear-selected` - bulk clear selected alerts by `ids`
+- `GET /export/combined.csv` - combined event+alert CSV download
+- `GET /actions` - response action audit records
+- `GET /actions/candidates` - actionable records + allowed action types
+- `POST /actions/execute` - trigger guarded response action
+
+## Final demo runbook
+
+1. Start receiver: `make server`
+2. Start web API/dashboard: `make web-ui`
+3. Start agent on endpoint: `make agent` (or direct `python -m agent.main ...`)
+4. Open dashboard: [http://localhost:8000](http://localhost:8000)
+5. Verify:
+   - events and alerts populate,
+   - select rows and run **clear selected** in each tab,
+   - export CSV and inspect both `record_kind=event` and `record_kind=alert` rows,
+   - execute a dry-run response action and confirm it appears in action history.
 
 ## License / status
 

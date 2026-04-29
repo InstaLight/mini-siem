@@ -13,10 +13,12 @@ logger = logging.getLogger(__name__)
 _STORAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 EVENTS_FILE = os.path.join(_STORAGE_DIR, "events.json")
 ALERTS_FILE = os.path.join(_STORAGE_DIR, "alerts.json")
+ACTIONS_FILE = os.path.join(_STORAGE_DIR, "actions.json")
 
 # Locks for thread-safe append (socket server uses multiple threads)
 events_lock = threading.Lock()
 alerts_lock = threading.Lock()
+actions_lock = threading.Lock()
 
 
 def load_json_list(path: str) -> list:
@@ -84,4 +86,31 @@ def clear_json_list(path: str, lock: threading.Lock) -> bool:
             return True
         except Exception as e:
             logger.error("Failed to clear %s: %s", path, e)
+            return False
+
+
+def remove_items_by_ids(path: str, lock: threading.Lock, ids: set[str], id_key: str) -> int:
+    """
+    Remove items where item[id_key] is included in ids.
+    Returns count of removed items.
+    """
+    if not ids:
+        return 0
+    with lock:
+        items = load_json_list(path)
+        kept = [item for item in items if str(item.get(id_key, "")) not in ids]
+        removed = len(items) - len(kept)
+        if removed:
+            _write_json_list(path, kept)
+        return removed
+
+
+def write_json_list(path: str, lock: threading.Lock, items: list) -> bool:
+    """Replace file contents with the provided JSON list."""
+    with lock:
+        try:
+            _write_json_list(path, items)
+            return True
+        except Exception as e:
+            logger.error("Failed to write %s: %s", path, e)
             return False
