@@ -556,5 +556,373 @@
     },
     "raw": "2026-05-03 12:25:01.927 Df sudo[29094:ef22cb] patricksmith : 2 incorrect password attempts ; TTY=ttys006 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=fakeuser@localhost",
     "event_id": "6d735934-e384-45c8-9433-377a590f38e1"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "ebf2943f-8efa-4bc9-b330-bc6f23a5c467",
+      "timestamp": "2026-05-03T22:14:00.953Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent connected",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "ebf2943f-8efa-4bc9-b330-bc6f23a5c467"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "50d2b8ff-65c8-4c22-b6ad-aef713ecc03e",
+      "timestamp": "2026-05-03T22:14:00.967Z",
+      "source": "macos_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "service": "login",
+      "message": "Filtering the log data using \"composedMessage CONTAINS \"sudo\" OR composedMessage CONTAINS \"Failed password\" OR composedMessage CONTAINS \"Accepted \" OR composedMessage CONTAINS[c] \"authentication failure\" OR composedMessage CONTAINS[c] \"failed authentication\" OR composedMessage CONTAINS[c] \"incorrect password\" OR composedMessage CONTAINS[c] \"loginwindow\"\"",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "Filtering the log data using \"composedMessage CONTAINS \"sudo\" OR composedMessage CONTAINS \"Failed password\" OR composedMessage CONTAINS \"Accepted \" OR composedMessage CONTAINS[c] \"authentication failure\" OR composedMessage CONTAINS[c] \"failed authentication\" OR composedMessage CONTAINS[c] \"incorrect password\" OR composedMessage CONTAINS[c] \"loginwindow\"\"",
+    "event_id": "50d2b8ff-65c8-4c22-b6ad-aef713ecc03e"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "a36f7fd4-f1a5-4e03-bd9e-987bd10e7edc",
+      "timestamp": "2026-05-03T22:14:30.959Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "a36f7fd4-f1a5-4e03-bd9e-987bd10e7edc"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "959835ea-86a6-4d2e-9e97-5005709a67d8",
+      "timestamp": "2026-05-03T22:15:00.968Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "959835ea-86a6-4d2e-9e97-5005709a67d8"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "46836e35-a198-4208-8d11-de93a6420605",
+      "timestamp": "2026-05-03T22:15:31.029Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "46836e35-a198-4208-8d11-de93a6420605"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "00df83f6-10af-41b7-906b-9e5c1b0f7a69",
+      "timestamp": "2026-05-03T22:16:01.042Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "00df83f6-10af-41b7-906b-9e5c1b0f7a69"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "2e264b61-b9d7-4a36-98d9-f8c486210d2d",
+      "timestamp": "2026-05-03T22:16:30.339Z",
+      "source": "macos_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "root",
+      "service": "login",
+      "message": "2026-05-03 18:16:30.339 Df sudo[40426:f22b3e] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+      "src_ip": ""
+    },
+    "raw": "2026-05-03 18:16:30.339 Df sudo[40426:f22b3e] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+    "event_id": "2e264b61-b9d7-4a36-98d9-f8c486210d2d"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "0d14d21c-0e4b-476e-b716-553b5dba308e",
+      "timestamp": "2026-05-03T22:16:31.048Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "0d14d21c-0e4b-476e-b716-553b5dba308e"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "4a465f17-5e60-495f-9c3a-876a145b7cef",
+      "timestamp": "2026-05-03T22:16:39.882Z",
+      "source": "macos_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "root",
+      "service": "login",
+      "message": "2026-05-03 18:16:39.881 Df sudo[40496:f22cd2] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+      "src_ip": ""
+    },
+    "raw": "2026-05-03 18:16:39.881 Df sudo[40496:f22cd2] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+    "event_id": "4a465f17-5e60-495f-9c3a-876a145b7cef"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "47eddf9f-9547-4d0c-8536-70c684e33d85",
+      "timestamp": "2026-05-03T22:16:49.978Z",
+      "source": "macos_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "root",
+      "service": "login",
+      "message": "2026-05-03 18:16:49.978 Df sudo[40561:f22e2e] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+      "src_ip": ""
+    },
+    "raw": "2026-05-03 18:16:49.978 Df sudo[40561:f22e2e] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+    "event_id": "47eddf9f-9547-4d0c-8536-70c684e33d85"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "ac41daa2-d1d9-4622-b7c2-6d129e64c2c1",
+      "timestamp": "2026-05-03T22:16:57.982Z",
+      "source": "macos_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "root",
+      "service": "login",
+      "message": "2026-05-03 18:16:57.982 Df sudo[40614:f22f6a] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+      "src_ip": ""
+    },
+    "raw": "2026-05-03 18:16:57.982 Df sudo[40614:f22f6a] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+    "event_id": "ac41daa2-d1d9-4622-b7c2-6d129e64c2c1"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "5ebc07a8-143d-42f5-82d6-6ffc6b7cb32b",
+      "timestamp": "2026-05-03T22:17:01.049Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "5ebc07a8-143d-42f5-82d6-6ffc6b7cb32b"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "bd29c2cf-f7f4-4b56-abc4-898b3026a818",
+      "timestamp": "2026-05-03T22:17:31.056Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "bd29c2cf-f7f4-4b56-abc4-898b3026a818"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "3f21fc2a-7002-42f8-b121-8133f970ef59",
+      "timestamp": "2026-05-03T22:18:01.059Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "3f21fc2a-7002-42f8-b121-8133f970ef59"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "df29d729-61b3-49d5-b67e-390a2b6ba1f6",
+      "timestamp": "2026-05-03T22:18:31.065Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "df29d729-61b3-49d5-b67e-390a2b6ba1f6"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "343c8a56-5bba-45e6-93ab-0375c3887fb2",
+      "timestamp": "2026-05-03T22:19:01.069Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent heartbeat",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent heartbeat",
+    "event_id": "343c8a56-5bba-45e6-93ab-0375c3887fb2"
   }
 ]

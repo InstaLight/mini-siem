@@ -183,10 +183,54 @@
     return `<span class="chip ${cls}"><span class="dot"></span>${titleCase(s || "unknown")}</span>`;
   }
 
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+
+  function escapeJs(s) {
+    return String(s == null ? "" : s).replace(/\\/g, "\\\\").replace(/'/g, "\\'");
+  }
+
+  const AGENT_STATUS_LABELS = {
+    healthy: "Healthy",
+    at_risk: "At risk",
+    critical: "Critical",
+    disconnected: "Disconnected",
+  };
+  const AGENT_STATUS_CHIP_CLASS = {
+    healthy: "kind-ok",
+    at_risk: "kind-warn",
+    critical: "kind-err",
+    disconnected: "kind-muted",
+  };
+
+  function agentStatusChip(agent) {
+    const status = String(agent.status || "healthy");
+    const label = agent.status_label || AGENT_STATUS_LABELS[status] || titleCase(status);
+    const cls = AGENT_STATUS_CHIP_CLASS[status] || "kind-muted";
+    let title = "";
+    if (status === "disconnected") {
+      title = `No events received for ${agent.seconds_since_last_seen || 0}s`;
+    } else if (status === "critical" || status === "at_risk") {
+      title = `${agent.high_severity_last_15m || 0} high-severity warning(s) in last ${agent.high_window_minutes || 15} min`;
+    } else {
+      title = `Healthy - last seen ${agent.seconds_since_last_seen || 0}s ago`;
+    }
+    return `<span class="chip ${cls}" title="${escapeHtml(title)}"><span class="dot"></span>${escapeHtml(label)}</span>`;
+  }
+
   SIEM.humanTime = humanTime;
   SIEM.relativeTime = relativeTime;
   SIEM.titleCase = titleCase;
   SIEM.severityChip = severityChip;
+  SIEM.escapeHtml = escapeHtml;
+  SIEM.escapeJs = escapeJs;
+  SIEM.agentStatusChip = agentStatusChip;
 
   function setQueryParam(key, value) {
     const url = new URL(window.location.href);

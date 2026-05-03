@@ -6,7 +6,7 @@
 <div class="page-header">
   <div>
     <h1>Agents</h1>
-    <p class="page-subtitle">Endpoints currently reporting events. Quarantined agents can still send, but their events are flagged and auto-escalated.</p>
+    <p class="page-subtitle">Endpoints currently reporting events. Status reflects recent warning volume and whether the agent is still sending heartbeats.</p>
   </div>
 </div>
 
@@ -31,6 +31,16 @@
       </thead>
       <tbody id="agents-body">
         {% for agent in agents %}
+        {% set status = agent.status or 'healthy' %}
+        {% set chip_class = {'healthy': 'kind-ok', 'at_risk': 'kind-warn', 'critical': 'kind-err', 'disconnected': 'kind-muted'}.get(status, 'kind-muted') %}
+        {% set status_label = agent.status_label or status|replace('_', ' ')|title %}
+        {% if status == 'disconnected' %}
+          {% set status_title = 'No events received for ' ~ (agent.seconds_since_last_seen or 0) ~ 's' %}
+        {% elif status in ('critical', 'at_risk') %}
+          {% set status_title = (agent.high_severity_last_15m or 0) ~ ' high-severity warning(s) in last ' ~ (agent.high_window_minutes or 15) ~ ' min' %}
+        {% else %}
+          {% set status_title = 'Healthy - last seen ' ~ (agent.seconds_since_last_seen or 0) ~ 's ago' %}
+        {% endif %}
         <tr>
           <td class="mono">{{ agent.agent_id }}</td>
           <td>{{ agent.hostname or '-' }}</td>
@@ -39,14 +49,14 @@
           <td>{{ agent.last_seen or '-' }}</td>
           <td>{{ agent.event_count }}</td>
           <td>
+            <span class="chip {{ chip_class }}" title="{{ status_title }}"><span class="dot"></span>{{ status_label }}</span>
             {% if agent.quarantined %}
-              <span class="badge-quarantined">Quarantined</span>
-            {% else %}
-              <span class="chip kind-ok"><span class="dot"></span>Healthy</span>
+              <span class="badge-quarantined" title="Operator isolated this host">Quarantined</span>
             {% endif %}
           </td>
           <td class="cell-actions">
             <div class="row-actions">
+              <a class="btn" href="/warnings?agent={{ agent.agent_id | urlencode }}">Warnings</a>
               {% if agent.quarantined %}
               <button type="button" onclick="releaseAgent('{{ agent.agent_id }}')">Release</button>
               {% else %}
@@ -70,7 +80,7 @@
   async function quarantineAgent(agentId) {
     const ok = await SIEM.confirmToast(`Isolate host ${agentId}? Future events will be flagged and auto-escalated.`, { danger: true, confirmLabel: "Isolate" });
     if (!ok) return;
-    const res = await SIEM.postJson("/api/quarantine", { agent_id: agentId, requested_by: "agents-page" });
+    await SIEM.postJson("/api/quarantine", { agent_id: agentId, requested_by: "agents-page" });
     SIEM.showToast(`Agent ${agentId} quarantined.`, "ok");
     refresh();
   }
@@ -83,15 +93,6 @@
     refresh();
   }
 
-  function escapeHtml(s) {
-    return String(s == null ? "" : s)
-      .replace(/&/g, "&amp;")
-      .replace(/</g, "&lt;")
-      .replace(/>/g, "&gt;")
-      .replace(/"/g, "&quot;")
-      .replace(/'/g, "&#39;");
-  }
-
   function renderAgents(agents) {
     const body = document.getElementById("agents-body");
     if (!body) return;
@@ -100,29 +101,24 @@
       return;
     }
     body.innerHTML = agents.map((a) => {
+      const warnHref = "/warnings?agent=" + encodeURIComponent(a.agent_id);
       const action = a.quarantined
-        ? `<button type="button" onclick="releaseAgent('${escapeJs(a.agent_id)}')">Release</button>`
-        : `<button type="button" class="danger" onclick="quarantineAgent('${escapeJs(a.agent_id)}')">Isolate</button>`;
-      const status = a.quarantined
-        ? '<span class="badge-quarantined">Quarantined</span>'
-        : '<span class="chip kind-ok"><span class="dot"></span>Healthy</span>';
+        ? `<button type="button" onclick="releaseAgent('${SIEM.escapeJs(a.agent_id)}')">Release</button>`
+        : `<button type="button" class="danger" onclick="quarantineAgent('${SIEM.escapeJs(a.agent_id)}')">Isolate</button>`;
+      const statusHtml = SIEM.agentStatusChip(a) + (a.quarantined ? ' <span class="badge-quarantined" title="Operator isolated this host">Quarantined</span>' : '');
       return `
         <tr>
-          <td class="mono">${escapeHtml(a.agent_id)}</td>
-          <td>${escapeHtml(a.hostname || '-')}</td>
-          <td>${escapeHtml(a.os || '-')}</td>
-          <td class="mono">${escapeHtml(a.ip || '-')}</td>
-          <td>${escapeHtml(a.last_seen || '-')}</td>
+          <td class="mono">${SIEM.escapeHtml(a.agent_id)}</td>
+          <td>${SIEM.escapeHtml(a.hostname || '-')}</td>
+          <td>${SIEM.escapeHtml(a.os || '-')}</td>
+          <td class="mono">${SIEM.escapeHtml(a.ip || '-')}</td>
+          <td>${SIEM.escapeHtml(a.last_seen || '-')}</td>
           <td>${a.event_count}</td>
-          <td>${status}</td>
-          <td class="cell-actions"><div class="row-actions">${action}</div></td>
+          <td>${statusHtml}</td>
+          <td class="cell-actions"><div class="row-actions"><a class="btn" href="${warnHref}">Warnings</a>${action}</div></td>
         </tr>
       `;
     }).join("");
-  }
-
-  function escapeJs(s) {
-    return String(s || "").replace(/'/g, "\\'");
   }
 
   async function refresh() {

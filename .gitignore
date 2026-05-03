@@ -2580,3 +2580,5 @@ venv/bin/pip3
 venv/bin/uvicorn
 venv/pyvenv.cfg
 /venv
+/server/web/__pycache__
+/agent/__pycache__

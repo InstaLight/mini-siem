@@ -286,5 +286,60 @@
     "service": "login",
     "message": "2026-05-03 12:25:01.927 Df sudo[29094:ef22cb] patricksmith : 2 incorrect password attempts ; TTY=ttys006 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/k",
     "alert_id": "335bc779-6b2a-420f-961e-37f7b79d0533"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-05-03T22:14:00.967Z",
+    "client_id": "agent-001",
+    "username": "",
+    "src_ip": "",
+    "service": "login",
+    "message": "Filtering the log data using \"composedMessage CONTAINS \"sudo\" OR composedMessage CONTAINS \"Failed password\" OR composedMessage CONTAINS \"Accepted \" OR composedMessage CONTAINS[c] \"authentication failu",
+    "alert_id": "92d94540-d0ff-4042-a805-0b5826ef48b2"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-05-03T22:16:30.339Z",
+    "client_id": "agent-001",
+    "username": "root",
+    "src_ip": "",
+    "service": "login",
+    "message": "2026-05-03 18:16:30.339 Df sudo[40426:f22b3e] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/k",
+    "alert_id": "03e8afe6-c56b-4878-9ad3-5236a5be526c"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-05-03T22:16:39.882Z",
+    "client_id": "agent-001",
+    "username": "root",
+    "src_ip": "",
+    "service": "login",
+    "message": "2026-05-03 18:16:39.881 Df sudo[40496:f22cd2] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/k",
+    "alert_id": "718b7f57-e972-4fb4-a56b-94b188bbabea"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-05-03T22:16:49.978Z",
+    "client_id": "agent-001",
+    "username": "root",
+    "src_ip": "",
+    "service": "login",
+    "message": "2026-05-03 18:16:49.978 Df sudo[40561:f22e2e] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/k",
+    "alert_id": "09e138bd-93ca-4469-adaf-96fa19656d50"
+  },
+  {
+    "alert_type": "failed_password",
+    "severity": "low",
+    "timestamp": "2026-05-03T22:16:57.982Z",
+    "client_id": "agent-001",
+    "username": "root",
+    "src_ip": "",
+    "service": "login",
+    "message": "2026-05-03 18:16:57.982 Df sudo[40614:f22f6a] patricksmith : 3 incorrect password attempts ; TTY=ttys010 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/k",
+    "alert_id": "2b9832dd-41aa-4380-959c-7c7d5fb27278"
   }
 ]

@@ -11,6 +11,7 @@ from datetime import datetime, timedelta, timezone
 from io import StringIO
 from pathlib import Path
 from typing import Any
+from urllib.parse import quote
 
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.responses import HTMLResponse, RedirectResponse, StreamingResponse
@@ -39,10 +40,23 @@ app = FastAPI(title="Mini-SIEM Dashboard")
 app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
 
 templates = Jinja2Templates(directory=str(TEMPLATES_DIR))
+templates.env.filters["urlencode"] = lambda v: quote(str(v), safe="")
 
 
 SEVERITY_ORDER = {"high": 0, "medium": 1, "low": 2}
 VALID_SEVERITIES = set(SEVERITY_ORDER.keys())
+
+DISCONNECT_THRESHOLD_SECONDS = 90
+HIGH_WINDOW_MINUTES = 15
+AT_RISK_HIGH_COUNT = 3
+CRITICAL_HIGH_COUNT = 10
+
+STATUS_LABELS = {
+    "healthy": "Healthy",
+    "at_risk": "At risk",
+    "critical": "Critical",
+    "disconnected": "Disconnected",
+}
 
 
 
@@ -137,11 +151,14 @@ def _filter_alerts(
     ip: str = "",
     type_: str = "",
     since: datetime | None = None,
+    agent: str = "",
 ) -> list[dict[str, Any]]:
     sev_set = {s.lower() for s in (severity or []) if s.lower() in VALID_SEVERITIES}
     out: list[dict[str, Any]] = []
     for alert in alerts:
         if sev_set and str(alert.get("severity", "")).lower() not in sev_set:
+            continue
+        if agent and str(alert.get("client_id", "")) != agent:
             continue
         if user and user.lower() not in str(alert.get("username", "")).lower():
             continue
@@ -184,14 +201,17 @@ def _filter_events(
     ip: str = "",
     type_: str = "",
     since: datetime | None = None,
+    agent: str = "",
 ) -> list[dict[str, Any]]:
     sev_set = {s.lower() for s in (severity or []) if s.lower() in VALID_SEVERITIES}
     out: list[dict[str, Any]] = []
     for event in events:
         ev = event.get("event") or {}
         data = event.get("data") or {}
-        agent = event.get("agent") or {}
+        ev_agent = event.get("agent") or {}
         if sev_set and str(ev.get("severity", "")).lower() not in sev_set:
+            continue
+        if agent and str(ev_agent.get("id", "")) != agent:
             continue
         if user and user.lower() not in str(data.get("user", "")).lower():
             continue
@@ -210,8 +230,8 @@ def _filter_events(
                 data.get("src_ip"),
                 data.get("service"),
                 data.get("message"),
-                agent.get("id"),
-                agent.get("hostname"),
+                ev_agent.get("id"),
+                ev_agent.get("hostname"),
                 event.get("raw"),
             ],
             q,
@@ -238,12 +258,48 @@ def _query_filters(request: Request) -> dict[str, Any]:
         "ip": qp.get("ip", "").strip(),
         "type_": qp.get("type", "").strip(),
         "since": _since_window(qp.get("since", "")),
+        "agent": qp.get("agent", "").strip(),
     }
 
 
-def _agents_from_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
+def _high_counts_by_agent(alerts: list[dict[str, Any]]) -> dict[str, int]:
+    """Return a map of agent_id -> number of high-severity alerts in the recent window."""
+    cutoff = datetime.now(timezone.utc) - timedelta(minutes=HIGH_WINDOW_MINUTES)
+    counts: dict[str, int] = {}
+    for alert in alerts:
+        if str(alert.get("severity", "")).lower() != "high":
+            continue
+        ts = _parse_iso(str(alert.get("timestamp", "")))
+        if not ts or ts < cutoff:
+            continue
+        agent_id = str(alert.get("client_id", "") or "")
+        if not agent_id:
+            continue
+        counts[agent_id] = counts.get(agent_id, 0) + 1
+    return counts
+
+
+def _compute_agent_status(
+    *,
+    seconds_since_last_seen: float | None,
+    high_count: int,
+) -> str:
+    if seconds_since_last_seen is None or seconds_since_last_seen >= DISCONNECT_THRESHOLD_SECONDS:
+        return "disconnected"
+    if high_count >= CRITICAL_HIGH_COUNT:
+        return "critical"
+    if high_count >= AT_RISK_HIGH_COUNT:
+        return "at_risk"
+    return "healthy"
+
+
+def _agents_from_events(
+    events: list[dict[str, Any]],
+    alerts: list[dict[str, Any]] | None = None,
+) -> list[dict[str, Any]]:
     """Aggregate connected-agent metadata from the event stream."""
     quarantined_ids = {str(q.get("agent_id", "")) for q in list_quarantined_agents()}
+    high_counts = _high_counts_by_agent(alerts or [])
     per_agent: dict[str, dict[str, Any]] = {}
     for event in events:
         agent = event.get("agent") or {}
@@ -269,6 +325,26 @@ def _agents_from_events(events: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 existing["hostname"] = agent.get("hostname", existing["hostname"])
                 existing["os"] = agent.get("os", existing["os"])
                 existing["ip"] = agent.get("ip", existing["ip"])
+
+    now = datetime.now(timezone.utc)
+    for agent in per_agent.values():
+        last_seen_dt = _parse_iso(str(agent.get("last_seen", "")))
+        if last_seen_dt is None:
+            seconds_since = None
+        else:
+            seconds_since = max(0.0, (now - last_seen_dt).total_seconds())
+        high_count = high_counts.get(agent["agent_id"], 0)
+        status = _compute_agent_status(
+            seconds_since_last_seen=seconds_since,
+            high_count=high_count,
+        )
+        agent["status"] = status
+        agent["status_label"] = STATUS_LABELS.get(status, status.title())
+        agent["seconds_since_last_seen"] = int(seconds_since) if seconds_since is not None else None
+        agent["high_severity_last_15m"] = high_count
+        agent["high_window_minutes"] = HIGH_WINDOW_MINUTES
+        agent["disconnect_threshold_seconds"] = DISCONNECT_THRESHOLD_SECONDS
+
     agents = list(per_agent.values())
     agents.sort(key=lambda a: a["last_seen"], reverse=True)
     return agents
@@ -321,7 +397,11 @@ def _summary_payload() -> dict[str, Any]:
     latest_event = max((e.get("event", {}).get("timestamp", "") for e in events), default="")
     latest_alert = max((a.get("timestamp", "") for a in alerts), default="")
     latest_activity = max(latest_event, latest_alert) if (latest_event or latest_alert) else ""
-    agents = _agents_from_events(events)
+    agents = _agents_from_events(events, alerts)
+    status_counts = {key: 0 for key in STATUS_LABELS}
+    for agent in agents:
+        status_counts[agent.get("status", "healthy")] = status_counts.get(agent.get("status", "healthy"), 0) + 1
+    connected = sum(1 for a in agents if a.get("status") != "disconnected")
     return {
         "total_activity": len(events),
         "total_warnings": len(alerts),
@@ -329,7 +409,9 @@ def _summary_payload() -> dict[str, Any]:
         "medium_priority": sev["medium"],
         "low_priority": sev["low"],
         "latest_activity": latest_activity,
-        "connected_agents": len(agents),
+        "connected_agents": connected,
+        "total_agents": len(agents),
+        "agent_status_counts": status_counts,
         "blocked_ip_count": len(list_blocked_ips()),
         "quarantined_agent_count": len(list_quarantined_agents()),
     }
@@ -384,7 +466,7 @@ def api_event_detail(event_id: str):
 
 @app.get("/api/agents")
 def api_agents():
-    return {"agents": _agents_from_events(_enriched_events())}
+    return {"agents": _agents_from_events(_enriched_events(), _enriched_alerts())}
 
 
 @app.get("/api/timeseries")
@@ -819,7 +901,7 @@ def _page_context(request: Request, *, nav_current: str, **extra: Any) -> dict[s
 def page_overview(request: Request):
     events = _enriched_events()
     alerts = _enriched_alerts()
-    agents = _agents_from_events(events)
+    agents = _agents_from_events(events, alerts)
     latest_alerts = sorted(
         alerts,
         key=lambda a: -_timestamp_epoch(str(a.get("timestamp", ""))),
@@ -843,15 +925,18 @@ def page_overview(request: Request):
 @app.get("/warnings", response_class=HTMLResponse)
 def page_warnings(request: Request):
     alerts = _enriched_alerts()
+    events = _enriched_events()
     filters = _query_filters(request)
     filtered = _filter_alerts(alerts, **filters)
     types = sorted({str(a.get("alert_type", "")) for a in alerts if a.get("alert_type")})
+    agents = _agents_from_events(events, alerts)
     ctx = _page_context(
         request,
         nav_current="warnings",
         alerts=filtered,
         total_alerts=len(alerts),
         alert_types=types,
+        agents=agents,
         filters_view={
             "q": filters["q"],
             "severity": filters["severity"],
@@ -859,6 +944,7 @@ def page_warnings(request: Request):
             "ip": filters["ip"],
             "type": filters["type_"],
             "since": request.query_params.get("since", "all"),
+            "agent": filters["agent"],
         },
     )
     return templates.TemplateResponse(request=request, name="warnings_list.html", context=ctx)
@@ -883,17 +969,20 @@ def page_warning_detail(request: Request, alert_id: str):
 @app.get("/activity", response_class=HTMLResponse)
 def page_activity(request: Request):
     events = _enriched_events()
+    alerts = _enriched_alerts()
     filters = _query_filters(request)
     filtered = _filter_events(events, **filters)
     types = sorted(
         {str(e.get("event", {}).get("type", "")) for e in events if e.get("event", {}).get("type")}
     )
+    agents = _agents_from_events(events, alerts)
     ctx = _page_context(
         request,
         nav_current="activity",
         events=filtered,
         total_events=len(events),
         event_types=types,
+        agents=agents,
         filters_view={
             "q": filters["q"],
             "severity": filters["severity"],
@@ -901,6 +990,7 @@ def page_activity(request: Request):
             "ip": filters["ip"],
             "type": filters["type_"],
             "since": request.query_params.get("since", "all"),
+            "agent": filters["agent"],
         },
     )
     return templates.TemplateResponse(request=request, name="activity_list.html", context=ctx)
@@ -925,7 +1015,8 @@ def page_activity_detail(request: Request, event_id: str):
 @app.get("/agents", response_class=HTMLResponse)
 def page_agents(request: Request):
     events = _enriched_events()
-    agents = _agents_from_events(events)
+    alerts = _enriched_alerts()
+    agents = _agents_from_events(events, alerts)
     ctx = _page_context(request, nav_current="agents", agents=agents)
     return templates.TemplateResponse(request=request, name="agents.html", context=ctx)
 

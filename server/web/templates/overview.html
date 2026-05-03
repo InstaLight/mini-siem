@@ -134,18 +134,27 @@
       </thead>
       <tbody id="agents-body">
         {% for agent in agents %}
+        {% set status = agent.status or 'healthy' %}
+        {% set chip_class = {'healthy': 'kind-ok', 'at_risk': 'kind-warn', 'critical': 'kind-err', 'disconnected': 'kind-muted'}.get(status, 'kind-muted') %}
+        {% set status_label = agent.status_label or status|replace('_', ' ')|title %}
+        {% if status == 'disconnected' %}
+          {% set status_title = 'No events received for ' ~ (agent.seconds_since_last_seen or 0) ~ 's' %}
+        {% elif status in ('critical', 'at_risk') %}
+          {% set status_title = (agent.high_severity_last_15m or 0) ~ ' high-severity warning(s) in last ' ~ (agent.high_window_minutes or 15) ~ ' min' %}
+        {% else %}
+          {% set status_title = 'Healthy - last seen ' ~ (agent.seconds_since_last_seen or 0) ~ 's ago' %}
+        {% endif %}
         <tr>
-          <td class="mono">{{ agent.agent_id }}</td>
+          <td class="mono"><a href="/warnings?agent={{ agent.agent_id | urlencode }}">{{ agent.agent_id }}</a></td>
           <td>{{ agent.hostname or '-' }}</td>
           <td>{{ agent.os or '-' }}</td>
           <td class="mono">{{ agent.ip or '-' }}</td>
           <td>{{ agent.last_seen or '-' }}</td>
           <td>{{ agent.event_count }}</td>
           <td>
+            <span class="chip {{ chip_class }}" title="{{ status_title }}"><span class="dot"></span>{{ status_label }}</span>
             {% if agent.quarantined %}
-              <span class="badge-quarantined">Quarantined</span>
-            {% else %}
-              <span class="chip kind-ok"><span class="dot"></span>Healthy</span>
+              <span class="badge-quarantined" title="Operator isolated this host">Quarantined</span>
             {% endif %}
           </td>
         </tr>
@@ -190,17 +199,20 @@
         body.innerHTML = '<tr><td colspan="7" class="empty-state">No agents have reported yet.</td></tr>';
         return;
       }
-      body.innerHTML = agents.map((a) => `
+      body.innerHTML = agents.map((a) => {
+        const statusHtml = SIEM.agentStatusChip(a) + (a.quarantined ? ' <span class="badge-quarantined" title="Operator isolated this host">Quarantined</span>' : '');
+        return `
         <tr>
-          <td class="mono">${escapeHtml(a.agent_id)}</td>
+          <td class="mono"><a href="/warnings?agent=${encodeURIComponent(a.agent_id)}">${escapeHtml(a.agent_id)}</a></td>
           <td>${escapeHtml(a.hostname || '-')}</td>
           <td>${escapeHtml(a.os || '-')}</td>
           <td class="mono">${escapeHtml(a.ip || '-')}</td>
           <td>${escapeHtml(a.last_seen || '-')}</td>
           <td>${a.event_count}</td>
-          <td>${a.quarantined ? '<span class="badge-quarantined">Quarantined</span>' : '<span class="chip kind-ok"><span class="dot"></span>Healthy</span>'}</td>
+          <td>${statusHtml}</td>
         </tr>
-      `).join("");
+      `;
+      }).join("");
     }
 
     function renderLatestList(containerId, items, urlPrefix, titleKey, severityPath, userKey, ipKey, tsKey) {

@@ -19,6 +19,12 @@
     <input type="search" name="q" placeholder="Search user, IP, type, message..." value="{{ filters_view.q }}"/>
     <input type="text" name="user" placeholder="User" value="{{ filters_view.user }}"/>
     <input type="text" name="ip" placeholder="Source IP" value="{{ filters_view.ip }}"/>
+    <select name="agent" aria-label="Agent" onchange="document.getElementById('filter-form').submit()">
+      <option value="">All agents</option>
+      {% for ag in agents|sort(attribute='agent_id') %}
+      <option value="{{ ag.agent_id }}" {% if filters_view.agent == ag.agent_id %}selected{% endif %}>{{ ag.hostname or 'Unknown host' }} — {{ ag.agent_id }}</option>
+      {% endfor %}
+    </select>
     <select name="type">
       <option value="">Any type</option>
       {% for t in alert_types %}
