@@ -1,6 +1,6 @@
 # Mini-SIEM
 
-A small **SIEM-style** demo: OS agents tail authentication logs, send **newline-delimited JSON** over **TCP** to a Python server. The server stores events, runs **pluggable detection rules**, and exposes a **FastAPI** dashboard.
+A small **SIEM-style** project: OS agents tail authentication logs, send **newline-delimited JSON** over **TCP** to a Python server. The server stores events, runs **pluggable detection rules**, and exposes a **FastAPI** dashboard.
 
 > **Note:** This is a learning / lab architecture. For production you would add TLS, stronger auth, durable storage, and hardened parsing.
 
@@ -92,7 +92,7 @@ python3 -m agent.main --config agent/config.json
 make server    # socket ingest
 make web-ui    # FastAPI
 make agent     # agent with default config path (adjust Makefile if needed)
-make seed-demo # push varied dummy events to receiver for demos
+make seed-data # push varied sample events to receiver
 make install-startup   # install OS-login startup for agent (macOS/Linux)
 make uninstall-startup # remove OS-login startup service
 ```
@@ -148,12 +148,12 @@ Optional extra keys (e.g. `command` for sudo) are allowed. Use `make_event()` so
 ## Development notes
 
 - **Reconnect:** The agent reconnects in a loop if the TCP session drops (`reconnect_delay_seconds` in config).
-- **Clear alerts:** `POST /alerts/clear` (demo button on the dashboard) wipes `alerts.json`.
+- **Clear alerts:** `POST /alerts/clear` (dashboard button) wipes `alerts.json`.
 - **Windows:** First connection skips existing Security log backlog; only **new** records are forwarded.
 
 ## Real dashboard features
 
-The dashboard at [http://localhost:8000/](http://localhost:8000/) is a server-rendered Jinja2 UI with vanilla-JS live polling (5-10s). Every control is wired to a real endpoint - no placeholders.
+The dashboard at [http://localhost:8000/](http://localhost:8000/) is a server-rendered Jinja2 UI with vanilla-JS live polling (5-10s).
 
 Top-level pages:
 
@@ -181,19 +181,15 @@ Legacy URLs `/health`, `/issues`, `/actions`, `/admin` redirect to the new pages
 
 Every action call stores a record in `server/storage/actions.json` with the requester, targets, status, dry-run flag, reason, and full details payload.
 
-## Demo data seeding
+## Sample data seeding
 
-For demonstrations, seed realistic mixed activity directly through the normal TCP ingest path:
-
-```bash
-make seed-demo
-```
-
-Or run manually with options:
+Seed realistic mixed activity directly through the normal TCP ingest path:
 
 ```bash
-python3 scripts/seed_demo_data.py --host 127.0.0.1 --port 9001 --burst-multiplier 2
+make seed-data
 ```
+
+Or run manually with options using the seeding script in `scripts/`.
 
 This generates varied event types to trigger multiple detectors:
 
@@ -204,17 +200,6 @@ This generates varied event types to trigger multiple detectors:
 - repeated privilege escalation (sudo abuse),
 - incorrect password samples.
 
-## Response action safety model
-
-- Allowed action types are explicitly allowlisted (see the table above).
-- The API accepts a `dry_run` flag; the new UI defaults to `dry_run=false` so demo actions are real, but the field is still honored for scripted calls.
-- Every action request is recorded in `server/storage/actions.json` with:
-  - action ID, requester, timestamps
-  - targeted IDs + resolved src_ips / agent ids
-  - status + full execution details
-- `terminate_process` executes only on the local server host (PID-based MVP path).
-- `isolate_host` and `block_ip` are enforced inside the TCP receiver (see `server/response/enforcement.py`).
-
 ## OS-login startup automation
 
 Install/remove startup services:
@@ -223,11 +208,6 @@ Install/remove startup services:
 make install-startup
 make uninstall-startup
 ```
-
-Under the hood:
-
-- **macOS:** installs `~/Library/LaunchAgents/com.mini-siem.agent.plist`
-- **Linux:** installs `~/.config/systemd/user/mini-siem-agent.service`
 
 Environment overrides (optional):
 
@@ -263,21 +243,3 @@ Legacy-compatible endpoints (same contracts as before): `GET /events`, `GET /ale
 
 CSV exports: `/export/combined.csv`, `/export/alerts.csv`, `/export/events.csv`, `/export/actions.csv`.
 
-## Final demo runbook
-
-1. Start receiver: `make server`
-2. Start web API/dashboard: `make web-ui`
-3. Seed demonstration data: `make seed-demo`
-4. Open dashboard: [http://localhost:8000](http://localhost:8000)
-5. Walk non-technical viewers through:
-   - **Overview** - summary cards + severity donut + activity timeline.
-   - **Warnings** - filter by severity/time, click a row to open the warning detail.
-   - From a warning detail, click **Block IP** and **Isolate host**; watch them land in `/blocklist` and `/responses` live.
-   - **Activity** - same pattern for raw events.
-   - **Agents** - isolate/release a host with one click.
-   - **Responses** - full audit trail with expandable JSON details.
-6. Re-run `make seed-demo` after blocking the demo IP (`203.0.113.9`) to demonstrate that blocked events never land in the activity list.
-
-## License / status
-
-Educational / demo quality — extend as needed for your environment.

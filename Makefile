@@ -1,4 +1,4 @@
-.PHONY: server agent web-ui install-startup uninstall-startup seed-demo
+.PHONY: server agent web-ui install-startup uninstall-startup seed-demo seed-data
 
 PYTHON ?= python3
 VENV_PYTHON := ./venv/bin/python3
@@ -26,4 +26,8 @@ uninstall-startup:
 
 seed-demo:
 	@echo "Seeding demo events into receiver..."
+	$(RUN_PYTHON) scripts/seed_demo_data.py --host 127.0.0.1 --port 9001
+
+seed-data:
+	@echo "Seeding sample events into receiver..."
 	$(RUN_PYTHON) scripts/seed_demo_data.py --host 127.0.0.1 --port 9001
