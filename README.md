@@ -2,8 +2,6 @@
 
 A small **SIEM-style** project: OS agents tail authentication logs, send **newline-delimited JSON** over **TCP** to a Python server. The server stores events, runs **pluggable detection rules**, and exposes a **FastAPI** dashboard.
 
-> **Note:** This is a learning / lab architecture. For production you would add TLS, stronger auth, durable storage, and hardened parsing.
-
 ## Architecture
 
 ```
@@ -145,13 +143,8 @@ All collectors should output:
 
 Optional extra keys (e.g. `command` for sudo) are allowed. Use `make_event()` so empty fields are filled consistently.
 
-## Development notes
 
-- **Reconnect:** The agent reconnects in a loop if the TCP session drops (`reconnect_delay_seconds` in config).
-- **Clear alerts:** `POST /alerts/clear` (dashboard button) wipes `alerts.json`.
-- **Windows:** First connection skips existing Security log backlog; only **new** records are forwarded.
-
-## Real dashboard features
+## Dashboard features
 
 The dashboard at [http://localhost:8000/](http://localhost:8000/) is a server-rendered Jinja2 UI with vanilla-JS live polling (5-10s).
 
@@ -167,7 +160,7 @@ Top-level pages:
 
 Legacy URLs `/health`, `/issues`, `/actions`, `/admin` redirect to the new pages so old links keep working.
 
-## Real response actions
+## Response actions
 
 `ALLOWED_ACTIONS`:
 
@@ -180,25 +173,6 @@ Legacy URLs `/health`, `/issues`, `/actions`, `/admin` redirect to the new pages
 | `terminate_process` | Local `kill -9` against any numeric PIDs in `target_ids` (MVP; same behavior as before). |
 
 Every action call stores a record in `server/storage/actions.json` with the requester, targets, status, dry-run flag, reason, and full details payload.
-
-## Sample data seeding
-
-Seed realistic mixed activity directly through the normal TCP ingest path:
-
-```bash
-make seed-data
-```
-
-Or run manually with options using the seeding script in `scripts/`.
-
-This generates varied event types to trigger multiple detectors:
-
-- repeated auth failures (SSH brute-force signal),
-- distributed username spray from one IP,
-- successful login from a new IP,
-- successful login during suspicious UTC hours,
-- repeated privilege escalation (sudo abuse),
-- incorrect password samples.
 
 ## OS-login startup automation
 
