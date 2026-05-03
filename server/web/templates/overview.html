@@ -1,0 +1,295 @@
+{% extends "base.html" %}
+
+{% block title %}Overview - Mini-SIEM{% endblock %}
+
+{% block scripts_head %}
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js" defer></script>
+{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Overview</h1>
+    <p class="page-subtitle">A live snapshot of your security posture. Numbers refresh every few seconds.</p>
+  </div>
+  <div class="row-actions">
+    <a class="btn" href="/export/combined.csv">Export Combined CSV</a>
+  </div>
+</div>
+
+<section class="grid cols-4" id="summary-cards">
+  <a class="summary-card kind-info" href="/activity">
+    <span class="label">Activity records</span>
+    <span class="value" data-card="total_activity">{{ summary.total_activity }}</span>
+    <span class="hint" data-card="latest_activity">{{ summary.latest_activity or "No activity yet" }}</span>
+  </a>
+  <a class="summary-card kind-warn" href="/warnings">
+    <span class="label">Security warnings</span>
+    <span class="value" data-card="total_warnings">{{ summary.total_warnings }}</span>
+    <span class="hint"><span data-card="medium_priority">{{ summary.medium_priority }}</span> medium / <span data-card="low_priority">{{ summary.low_priority }}</span> low</span>
+  </a>
+  <a class="summary-card kind-high" href="/warnings?severity=high">
+    <span class="label">High-priority warnings</span>
+    <span class="value" data-card="high_priority">{{ summary.high_priority }}</span>
+    <span class="hint">Needs immediate review</span>
+  </a>
+  <a class="summary-card kind-ok" href="/agents">
+    <span class="label">Connected agents</span>
+    <span class="value" data-card="connected_agents">{{ summary.connected_agents }}</span>
+    <span class="hint"><span data-card="quarantined_agent_count">{{ summary.quarantined_agent_count }}</span> quarantined / <span data-card="blocked_ip_count">{{ summary.blocked_ip_count }}</span> IPs blocked</span>
+  </a>
+</section>
+
+<div class="divider"></div>
+
+<section class="overview-grid">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Activity over the last hour</h2>
+      <span class="panel-subtle">5-minute buckets</span>
+    </div>
+    <div class="chart-box tall">
+      <canvas id="activity-timeline"></canvas>
+    </div>
+  </div>
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Warnings by severity</h2>
+      <span class="panel-subtle">All current warnings</span>
+    </div>
+    <div class="chart-box">
+      <canvas id="severity-donut"></canvas>
+    </div>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="grid cols-2">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Latest warnings</h2>
+      <a href="/warnings" class="muted">View all &rsaquo;</a>
+    </div>
+    <ul class="list latest-list" id="latest-warnings">
+      {% for alert in latest_alerts %}
+      <a class="list-row" href="/warnings/{{ alert.alert_id }}">
+        <span class="chip sev-{{ alert.severity|default('low')|lower }}"><span class="dot"></span>{{ alert.severity|default('low')|title }}</span>
+        <span class="stack" style="flex:1; gap:0.15rem;">
+          <span class="title">{{ alert.alert_type|default('warning')|replace('_', ' ')|title }}</span>
+          <span class="meta">{{ alert.username or 'unknown user' }} &middot; {{ alert.src_ip or 'no source IP' }} &middot; {{ alert.timestamp }}</span>
+        </span>
+      </a>
+      {% endfor %}
+      {% if latest_alerts|length == 0 %}
+      <li class="empty-state">No warnings yet.</li>
+      {% endif %}
+    </ul>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Latest activity</h2>
+      <a href="/activity" class="muted">View all &rsaquo;</a>
+    </div>
+    <ul class="list latest-list" id="latest-activity">
+      {% for event in latest_events %}
+      <a class="list-row" href="/activity/{{ event.event_id }}">
+        <span class="chip sev-{{ event.event.severity|default('low')|lower }}"><span class="dot"></span>{{ event.event.severity|default('low')|title }}</span>
+        <span class="stack" style="flex:1; gap:0.15rem;">
+          <span class="title">
+            {{ event.event.type|default('event')|replace('_', ' ')|title }}
+            {% if event.quarantined %}<span class="badge-quarantined">Quarantined</span>{% endif %}
+          </span>
+          <span class="meta">{{ event.data.user or 'unknown user' }} &middot; {{ event.data.src_ip or 'no source IP' }} &middot; {{ event.event.timestamp }}</span>
+        </span>
+      </a>
+      {% endfor %}
+      {% if latest_events|length == 0 %}
+      <li class="empty-state">No activity yet.</li>
+      {% endif %}
+    </ul>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Agents reporting</h2>
+    <a href="/agents" class="muted">Manage agents &rsaquo;</a>
+  </div>
+  <div class="table-wrap">
+    <table class="table small-table">
+      <thead>
+        <tr>
+          <th>Agent</th>
+          <th>Host</th>
+          <th>OS</th>
+          <th>IP</th>
+          <th>Last seen</th>
+          <th>Events</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="agents-body">
+        {% for agent in agents %}
+        <tr>
+          <td class="mono">{{ agent.agent_id }}</td>
+          <td>{{ agent.hostname or '-' }}</td>
+          <td>{{ agent.os or '-' }}</td>
+          <td class="mono">{{ agent.ip or '-' }}</td>
+          <td>{{ agent.last_seen or '-' }}</td>
+          <td>{{ agent.event_count }}</td>
+          <td>
+            {% if agent.quarantined %}
+              <span class="badge-quarantined">Quarantined</span>
+            {% else %}
+              <span class="chip kind-ok"><span class="dot"></span>Healthy</span>
+            {% endif %}
+          </td>
+        </tr>
+        {% endfor %}
+        {% if agents|length == 0 %}
+        <tr><td colspan="7" class="empty-state">No agents have reported yet.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script src="/static/js/charts.js"></script>
+<script>
+  (function () {
+    const initialSeverity = {
+      high: {{ severity.high }},
+      medium: {{ severity.medium }},
+      low: {{ severity.low }},
+    };
+
+    let donut = null;
+    let timeline = null;
+
+    function start() {
+      if (typeof Chart === "undefined") {
+        return setTimeout(start, 200);
+      }
+      donut = SIEM.charts.createSeverityDonut("severity-donut", initialSeverity);
+      SIEM.getJson("/api/timeseries?window=60m&bucket=5m").then((data) => {
+        timeline = SIEM.charts.createActivityTimeline("activity-timeline", data);
+      });
+    }
+    start();
+
+    function renderAgentsBody(agents) {
+      const body = document.getElementById("agents-body");
+      if (!body) return;
+      if (!agents.length) {
+        body.innerHTML = '<tr><td colspan="7" class="empty-state">No agents have reported yet.</td></tr>';
+        return;
+      }
+      body.innerHTML = agents.map((a) => `
+        <tr>
+          <td class="mono">${escapeHtml(a.agent_id)}</td>
+          <td>${escapeHtml(a.hostname || '-')}</td>
+          <td>${escapeHtml(a.os || '-')}</td>
+          <td class="mono">${escapeHtml(a.ip || '-')}</td>
+          <td>${escapeHtml(a.last_seen || '-')}</td>
+          <td>${a.event_count}</td>
+          <td>${a.quarantined ? '<span class="badge-quarantined">Quarantined</span>' : '<span class="chip kind-ok"><span class="dot"></span>Healthy</span>'}</td>
+        </tr>
+      `).join("");
+    }
+
+    function renderLatestList(containerId, items, urlPrefix, titleKey, severityPath, userKey, ipKey, tsKey) {
+      const el = document.getElementById(containerId);
+      if (!el) return;
+      if (!items.length) {
+        el.innerHTML = '<li class="empty-state">No records yet.</li>';
+        return;
+      }
+      el.innerHTML = items.map((item) => {
+        const sev = getPath(item, severityPath) || "low";
+        const title = getPath(item, titleKey) || "event";
+        const user = getPath(item, userKey) || "unknown user";
+        const ip = getPath(item, ipKey) || "no source IP";
+        const ts = getPath(item, tsKey) || "";
+        const id = item.alert_id || item.event_id;
+        const quarantined = item.quarantined ? '<span class="badge-quarantined">Quarantined</span>' : "";
+        return `
+          <a class="list-row" href="${urlPrefix}/${encodeURIComponent(id)}">
+            ${SIEM.severityChip(sev)}
+            <span class="stack" style="flex:1; gap:0.15rem;">
+              <span class="title">${SIEM.titleCase(title)} ${quarantined}</span>
+              <span class="meta">${escapeHtml(user)} &middot; ${escapeHtml(ip)} &middot; ${escapeHtml(ts)}</span>
+            </span>
+          </a>
+        `;
+      }).join("");
+    }
+
+    function getPath(obj, path) {
+      return path.split(".").reduce((o, k) => (o == null ? o : o[k]), obj);
+    }
+
+    function escapeHtml(s) {
+      return String(s == null ? "" : s)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    SIEM.poll("/api/summary", 5000, (data) => {
+      document.querySelectorAll("[data-card]").forEach((el) => {
+        const key = el.getAttribute("data-card");
+        if (data[key] !== undefined && data[key] !== null) {
+          el.textContent = String(data[key]);
+        }
+      });
+      SIEM.updateLive("live");
+    });
+
+    SIEM.poll("/api/severity-breakdown", 5000, (data) => {
+      if (donut) donut.update(data);
+    });
+
+    SIEM.poll("/api/timeseries?window=60m&bucket=5m", 10000, (data) => {
+      if (timeline) timeline.update(data);
+    });
+
+    SIEM.poll("/api/alerts?limit=5", 5000, (data) => {
+      renderLatestList(
+        "latest-warnings",
+        data.alerts || [],
+        "/warnings",
+        "alert_type",
+        "severity",
+        "username",
+        "src_ip",
+        "timestamp"
+      );
+    });
+
+    SIEM.poll("/api/events?limit=5", 5000, (data) => {
+      renderLatestList(
+        "latest-activity",
+        data.events || [],
+        "/activity",
+        "event.type",
+        "event.severity",
+        "data.user",
+        "data.src_ip",
+        "event.timestamp"
+      );
+    });
+
+    SIEM.poll("/api/agents", 10000, (data) => {
+      renderAgentsBody((data.agents || []).slice(0, 8));
+    });
+  })();
+</script>
+{% endblock %}

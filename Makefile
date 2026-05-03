@@ -1,16 +1,20 @@
 .PHONY: server agent web-ui install-startup uninstall-startup seed-demo
 
+PYTHON ?= python3
+VENV_PYTHON := ./venv/bin/python3
+RUN_PYTHON := $(if $(wildcard $(VENV_PYTHON)),$(VENV_PYTHON),$(PYTHON))
+
 server:
 	@echo "Starting SIEM server..."
-	python3 -m server.receiver.socket_server
+	$(RUN_PYTHON) -m server.receiver.socket_server
 
 agent:
 	@echo "Starting SIEM agent (uses agent/config.json if present)..."
-	sudo python3 -m agent.main --config agent/config.json
+	sudo $(RUN_PYTHON) -m agent.main --config agent/config.json
 
 web-ui:
 	@echo "Starting Web-UI..."
-	python -m uvicorn server.web.main:app --reload --port 8000
+	$(RUN_PYTHON) -m uvicorn server.web.main:app --reload --port 8000
 
 install-startup:
 	@echo "Installing OS-login startup service for agent..."
@@ -22,4 +26,4 @@ uninstall-startup:
 
 seed-demo:
 	@echo "Seeding demo events into receiver..."
-	python3 scripts/seed_demo_data.py --host 127.0.0.1 --port 9001
+	$(RUN_PYTHON) scripts/seed_demo_data.py --host 127.0.0.1 --port 9001

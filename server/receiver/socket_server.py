@@ -11,10 +11,24 @@ from shared.schema import validate_event
 from server.detection import run_detectors
 from server.storage.alerts import store_alert
 from server.storage.events import store_event
+from server.response.enforcement import (
+    is_agent_quarantined,
+    is_ip_blocked,
+    make_quarantine_alert,
+)
 
 HOST = "0.0.0.0"
 PORT = 9001
 BUFFER_SIZE = 4096
+
+
+def _event_src_ip(event: dict) -> str:
+    return str((event.get("data") or {}).get("src_ip") or "")
+
+
+def _event_agent_id(event: dict) -> str:
+    return str((event.get("agent") or {}).get("id") or "")
+
 
 def handle_client(conn, addr):
     print(f"[+] Connected to agent: {addr}")
@@ -29,7 +43,6 @@ def handle_client(conn, addr):
 
             buffer += data.decode()
 
-            # Handle multiple JSON objects in stream
             while "\n" in buffer:
                 line, buffer = buffer.split("\n", 1)
 
@@ -39,13 +52,32 @@ def handle_client(conn, addr):
                 try:
                     event = json.loads(line)
 
-                    # Validate schema
-                    validate_event(event)
+                    if not validate_event(event):
+                        print("[!] Event failed schema validation; dropped")
+                        continue
 
-                    # Store event
+                    src_ip = _event_src_ip(event)
+                    agent_id = _event_agent_id(event)
+
+                    if src_ip and is_ip_blocked(src_ip):
+                        print(f"[BLOCK] dropping event from blocked IP {src_ip}")
+                        continue
+
+                    if agent_id and is_agent_quarantined(agent_id):
+                        event["quarantined"] = True
+                        store_event(event)
+                        quarantine_alert = make_quarantine_alert(event)
+                        print(
+                            f"\n[ALERT:HIGH] quarantined_host_activity "
+                            f"agent={agent_id}"
+                        )
+                        store_alert(quarantine_alert)
+                        for alert in run_detectors(event):
+                            store_alert(alert)
+                        continue
+
                     store_event(event)
 
-                    # Run modular detection pipeline
                     for alert in run_detectors(event):
                         sev = alert.get("severity", "").upper()
                         print(f"\n[ALERT:{sev}] {alert.get('alert_type')}")

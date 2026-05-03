@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>{% block title %}Mini-SIEM{% endblock %}</title>
+  <link rel="stylesheet" href="/static/css/app.css"/>
+  {% block head_extra %}{% endblock %}
+</head>
+<body>
+  <div class="app-shell">
+    <header class="topbar">
+      <a class="brand" href="/">
+        <span class="brand-dot"></span>
+        Mini-SIEM
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="/" class="{% if nav_current == 'overview' %}active{% endif %}">Overview</a>
+        <a href="/warnings" class="{% if nav_current == 'warnings' %}active{% endif %}">Warnings</a>
+        <a href="/activity" class="{% if nav_current == 'activity' %}active{% endif %}">Activity</a>
+        <a href="/agents" class="{% if nav_current == 'agents' %}active{% endif %}">Agents</a>
+        <a href="/responses" class="{% if nav_current == 'responses' %}active{% endif %}">Responses</a>
+        <a href="/blocklist" class="{% if nav_current == 'blocklist' %}active{% endif %}">Blocklist</a>
+      </nav>
+      <div class="topbar-right">
+        <span class="live-indicator" title="Auto-refresh status">
+          <span class="live-dot"></span>
+          <span class="live-label">Live</span>
+        </span>
+      </div>
+    </header>
+
+    <main class="container">
+      {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+      Mini-SIEM &middot; SSR + live polling &middot; every control is wired to a real endpoint
+    </footer>
+  </div>
+
+  <div id="toast-host" class="toast-host" role="status" aria-live="polite"></div>
+
+  {% block scripts_head %}{% endblock %}
+  <script src="/static/js/app.js"></script>
+  {% block scripts %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,157 @@
+{% extends "base.html" %}
+
+{% block title %}{{ event.event.type|default('Event')|replace('_', ' ')|title }} - Mini-SIEM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="muted" style="margin:0;"><a href="/activity">&lsaquo; All activity</a></p>
+    <h1>{{ event.event.type|default('Event')|replace('_', ' ')|title }}</h1>
+    <p class="page-subtitle">{{ event.data.message or 'Normalized event received from an agent.' }}</p>
+  </div>
+  <div class="row-actions">
+    <span class="chip sev-{{ event.event.severity|default('low')|lower }}"><span class="dot"></span>{{ event.event.severity|default('low')|title }} priority</span>
+    {% if event.quarantined %}<span class="badge-quarantined">Quarantined host</span>{% endif %}
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Details</h2>
+    <span class="panel-subtle mono">{{ event.event_id }}</span>
+  </div>
+  <dl class="key-value">
+    <dt>Time</dt><dd>{{ event.event.timestamp or '-' }}</dd>
+    <dt>Source rule</dt><dd>{{ event.event.source or '-' }}</dd>
+    <dt>User</dt><dd>{{ event.data.user or '-' }}</dd>
+    <dt>Source IP</dt><dd>{{ event.data.src_ip or '-' }}</dd>
+    <dt>Service</dt><dd>{{ event.data.service or '-' }}</dd>
+    <dt>Agent</dt><dd>{{ event.agent.id or '-' }}</dd>
+    <dt>Hostname</dt><dd>{{ event.agent.hostname or '-' }}</dd>
+    <dt>Agent OS</dt><dd>{{ event.agent.os or '-' }}</dd>
+    <dt>Agent IP</dt><dd>{{ event.agent.ip or '-' }}</dd>
+    <dt>Message</dt><dd>{{ event.data.message or '-' }}</dd>
+    <dt>Raw</dt><dd class="mono">{{ event.raw or '-' }}</dd>
+  </dl>
+</section>
+
+<div class="divider"></div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Response actions</h2>
+    <span class="panel-subtle">Every action runs immediately and is recorded in Responses.</span>
+  </div>
+  <div class="row-actions">
+    {% if event.data.src_ip %}
+    <button type="button" class="danger" onclick="blockSourceIp()">Block source IP ({{ event.data.src_ip }})</button>
+    {% endif %}
+    {% if event.agent.id %}
+    <button type="button" class="danger" onclick="isolateHost()">Isolate host ({{ event.agent.id }})</button>
+    {% endif %}
+    <button type="button" onclick="clearThisEvent()">Clear this activity record</button>
+    <button type="button" onclick="toggleExtra()">Run other action...</button>
+  </div>
+  <div id="extra-action-row" class="row-actions hidden" style="margin-top:0.5rem;">
+    <select id="extra-action-type">
+      {% for action in allowed_actions %}
+      <option value="{{ action }}">{{ action|replace('_', ' ')|title }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" id="extra-action-reason" placeholder="Reason (optional)"/>
+    <button type="button" class="primary" onclick="runExtraAction()">Execute</button>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Related activity</h2>
+    <span class="panel-subtle">{{ related_events|length }} other record(s) from the same user, IP, or agent</span>
+  </div>
+  {% if related_events|length == 0 %}
+  <p class="empty-state">No related activity was found.</p>
+  {% else %}
+  <div class="table-wrap">
+    <table class="table small-table">
+      <thead>
+        <tr>
+          <th>Severity</th>
+          <th>Type</th>
+          <th>User</th>
+          <th>Source IP</th>
+          <th>Agent</th>
+          <th>When</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for related in related_events %}
+        <tr>
+          <td><span class="chip sev-{{ related.event.severity|default('low')|lower }}"><span class="dot"></span>{{ related.event.severity|default('low')|title }}</span></td>
+          <td>{{ related.event.type|replace('_', ' ')|title }}</td>
+          <td>{{ related.data.user or '-' }}</td>
+          <td class="mono">{{ related.data.src_ip or '-' }}</td>
+          <td class="mono">{{ related.agent.id or '-' }}</td>
+          <td>{{ related.event.timestamp }}</td>
+          <td><a class="btn" href="/activity/{{ related.event_id }}">Inspect</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+
+<div class="divider"></div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Raw event record</h2>
+  </div>
+  <pre class="json-dump">{{ event|tojson(indent=2) }}</pre>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const eventId = {{ event.event_id|tojson }};
+  const srcIp = {{ event.data.src_ip|default('')|tojson }};
+  const agentId = {{ event.agent.id|default('')|tojson }};
+
+  async function blockSourceIp() {
+    if (!srcIp) return SIEM.showToast("This event has no source IP.", "err");
+    const result = await SIEM.executeAction("block_ip", [eventId], {
+      confirmText: `Block source IP ${srcIp}?`,
+    });
+    if (result) SIEM.showToast(`Blocked ${srcIp}.`, "ok");
+  }
+
+  async function isolateHost() {
+    if (!agentId) return SIEM.showToast("This event has no agent id.", "err");
+    const result = await SIEM.executeAction("isolate_host", [eventId], {
+      confirmText: `Isolate host ${agentId}?`,
+    });
+    if (result) SIEM.showToast(`Host ${agentId} is now quarantined.`, "ok");
+  }
+
+  async function clearThisEvent() {
+    const ok = await SIEM.confirmToast("Remove this activity record?", { danger: true, confirmLabel: "Clear" });
+    if (!ok) return;
+    const res = await SIEM.postJson("/api/events/clear-selected", { ids: [eventId] });
+    SIEM.showToast(`Cleared ${res.removed} record(s).`, "ok");
+    setTimeout(() => (window.location.href = "/activity"), 400);
+  }
+
+  function toggleExtra() {
+    document.getElementById("extra-action-row").classList.toggle("hidden");
+  }
+
+  async function runExtraAction() {
+    const actionType = document.getElementById("extra-action-type").value;
+    const reason = document.getElementById("extra-action-reason").value;
+    await SIEM.executeAction(actionType, [eventId], { reason });
+  }
+</script>
+{% endblock %}

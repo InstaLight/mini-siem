@@ -1,0 +1,151 @@
+{% extends "base.html" %}
+
+{% block title %}{{ alert.alert_type|default('Warning')|replace('_', ' ')|title }} - Mini-SIEM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <p class="muted" style="margin:0;"><a href="/warnings">&lsaquo; All warnings</a></p>
+    <h1>{{ alert.alert_type|default('Warning')|replace('_', ' ')|title }}</h1>
+    <p class="page-subtitle">{{ alert.message or 'A detection rule raised this warning from incoming events.' }}</p>
+  </div>
+  <div class="row-actions">
+    <span class="chip sev-{{ alert.severity|default('low')|lower }}"><span class="dot"></span>{{ alert.severity|default('low')|title }} priority</span>
+  </div>
+</div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Details</h2>
+    <span class="panel-subtle mono">{{ alert.alert_id }}</span>
+  </div>
+  <dl class="key-value">
+    <dt>Time</dt><dd>{{ alert.timestamp or '-' }}</dd>
+    <dt>User</dt><dd>{{ alert.username or '-' }}</dd>
+    <dt>Source IP</dt><dd>{{ alert.src_ip or '-' }}</dd>
+    <dt>Service</dt><dd>{{ alert.service or '-' }}</dd>
+    <dt>Agent</dt><dd>{{ alert.client_id or '-' }}</dd>
+    <dt>Message</dt><dd>{{ alert.message or '-' }}</dd>
+  </dl>
+</section>
+
+<div class="divider"></div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Response actions</h2>
+    <span class="panel-subtle">Every action here runs immediately and is recorded in Responses.</span>
+  </div>
+  <div class="row-actions">
+    {% if alert.src_ip %}
+    <button type="button" class="danger" onclick="blockSourceIp()">Block source IP ({{ alert.src_ip }})</button>
+    {% endif %}
+    {% if alert.client_id %}
+    <button type="button" class="danger" onclick="isolateHost()">Isolate host ({{ alert.client_id }})</button>
+    {% endif %}
+    <button type="button" onclick="clearThisWarning()">Clear this warning</button>
+    <button type="button" onclick="runActionDropdown()">Run other action...</button>
+  </div>
+  <div id="extra-action-row" class="row-actions hidden" style="margin-top:0.5rem;">
+    <select id="extra-action-type">
+      {% for action in allowed_actions %}
+      <option value="{{ action }}">{{ action|replace('_', ' ')|title }}</option>
+      {% endfor %}
+    </select>
+    <input type="text" id="extra-action-reason" placeholder="Reason (optional)"/>
+    <button type="button" class="primary" onclick="runExtraAction()">Execute</button>
+  </div>
+</section>
+
+<div class="divider"></div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Related activity</h2>
+    <span class="panel-subtle">{{ related_events|length }} record(s) sharing the same user, IP, or agent</span>
+  </div>
+  {% if related_events|length == 0 %}
+  <p class="empty-state">No related activity found for this warning.</p>
+  {% else %}
+  <div class="table-wrap">
+    <table class="table small-table">
+      <thead>
+        <tr>
+          <th>Severity</th>
+          <th>Type</th>
+          <th>User</th>
+          <th>Source IP</th>
+          <th>Agent</th>
+          <th>When</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for event in related_events %}
+        <tr>
+          <td><span class="chip sev-{{ event.event.severity|default('low')|lower }}"><span class="dot"></span>{{ event.event.severity|default('low')|title }}</span></td>
+          <td>{{ event.event.type|replace('_', ' ')|title }}</td>
+          <td>{{ event.data.user or '-' }}</td>
+          <td class="mono">{{ event.data.src_ip or '-' }}</td>
+          <td class="mono">{{ event.agent.id or '-' }}</td>
+          <td>{{ event.event.timestamp }}</td>
+          <td><a class="btn" href="/activity/{{ event.event_id }}">Inspect</a></td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+</section>
+
+<div class="divider"></div>
+
+<section class="panel">
+  <div class="panel-header">
+    <h2>Raw warning record</h2>
+  </div>
+  <pre class="json-dump">{{ alert|tojson(indent=2) }}</pre>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  const alertId = {{ alert.alert_id|tojson }};
+  const srcIp = {{ alert.src_ip|default('')|tojson }};
+  const agentId = {{ alert.client_id|default('')|tojson }};
+
+  async function blockSourceIp() {
+    if (!srcIp) return SIEM.showToast("This warning has no source IP.", "err");
+    const result = await SIEM.executeAction("block_ip", [alertId], {
+      confirmText: `Block source IP ${srcIp}? The receiver will drop future events from it.`,
+    });
+    if (result) SIEM.showToast(`Blocked ${srcIp}.`, "ok");
+  }
+
+  async function isolateHost() {
+    if (!agentId) return SIEM.showToast("This warning has no agent id.", "err");
+    const result = await SIEM.executeAction("isolate_host", [alertId], {
+      confirmText: `Isolate host ${agentId}? Its future events will be flagged as quarantined.`,
+    });
+    if (result) SIEM.showToast(`Host ${agentId} is now quarantined.`, "ok");
+  }
+
+  async function clearThisWarning() {
+    const ok = await SIEM.confirmToast("Remove this warning from the list?", { danger: true, confirmLabel: "Clear" });
+    if (!ok) return;
+    const res = await SIEM.postJson("/api/alerts/clear-selected", { ids: [alertId] });
+    SIEM.showToast(`Cleared ${res.removed} warning(s).`, "ok");
+    setTimeout(() => (window.location.href = "/warnings"), 400);
+  }
+
+  function runActionDropdown() {
+    document.getElementById("extra-action-row").classList.toggle("hidden");
+  }
+
+  async function runExtraAction() {
+    const actionType = document.getElementById("extra-action-type").value;
+    const reason = document.getElementById("extra-action-reason").value;
+    await SIEM.executeAction(actionType, [alertId], { reason });
+  }
+</script>
+{% endblock %}

@@ -464,5 +464,97 @@
     },
     "raw": "sudo: 1 incorrect password attempt",
     "event_id": "93578d6e-d569-4f41-b546-0101638ddd60"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "e5d5dafb-cada-4038-9d03-f86732fba041",
+      "timestamp": "2026-05-03T16:24:25.090Z",
+      "source": "agent_runtime",
+      "type": "agent_heartbeat",
+      "severity": "low"
+    },
+    "data": {
+      "service": "agent",
+      "message": "Agent connected and heartbeat sent",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "agent connected",
+    "event_id": "e5d5dafb-cada-4038-9d03-f86732fba041"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "7bc4f02c-dfcf-4ad7-a2f2-c7dc365c4e94",
+      "timestamp": "2026-05-03T16:24:25.107Z",
+      "source": "macos_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "service": "login",
+      "message": "Filtering the log data using \"composedMessage CONTAINS \"sudo\" OR composedMessage CONTAINS \"Failed password\" OR composedMessage CONTAINS \"Accepted \" OR composedMessage CONTAINS[c] \"authentication failure\" OR composedMessage CONTAINS[c] \"failed authentication\" OR composedMessage CONTAINS[c] \"incorrect password\" OR composedMessage CONTAINS[c] \"loginwindow\"\"",
+      "user": "",
+      "src_ip": ""
+    },
+    "raw": "Filtering the log data using \"composedMessage CONTAINS \"sudo\" OR composedMessage CONTAINS \"Failed password\" OR composedMessage CONTAINS \"Accepted \" OR composedMessage CONTAINS[c] \"authentication failure\" OR composedMessage CONTAINS[c] \"failed authentication\" OR composedMessage CONTAINS[c] \"incorrect password\" OR composedMessage CONTAINS[c] \"loginwindow\"\"",
+    "event_id": "7bc4f02c-dfcf-4ad7-a2f2-c7dc365c4e94"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "5b3f9fc6-7861-460f-ab14-12c0938c2b53",
+      "timestamp": "2026-05-03T16:24:32.047Z",
+      "source": "macos_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "root",
+      "service": "login",
+      "message": "2026-05-03 12:24:32.044 Df sudo[27219:ef0124] patricksmith : 3 incorrect password attempts ; TTY=ttys006 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+      "src_ip": ""
+    },
+    "raw": "2026-05-03 12:24:32.044 Df sudo[27219:ef0124] patricksmith : 3 incorrect password attempts ; TTY=ttys006 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=/usr/bin/whoami",
+    "event_id": "5b3f9fc6-7861-460f-ab14-12c0938c2b53"
+  },
+  {
+    "agent": {
+      "id": "agent-001",
+      "hostname": "Patricks-MacBook-Air.local",
+      "os": "macos",
+      "ip": "10.192.96.167"
+    },
+    "event": {
+      "id": "6d735934-e384-45c8-9433-377a590f38e1",
+      "timestamp": "2026-05-03T16:25:01.928Z",
+      "source": "macos_log",
+      "type": "authentication_failure",
+      "severity": "medium"
+    },
+    "data": {
+      "user": "root",
+      "service": "login",
+      "message": "2026-05-03 12:25:01.927 Df sudo[29094:ef22cb] patricksmith : 2 incorrect password attempts ; TTY=ttys006 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=fakeuser@localhost",
+      "src_ip": ""
+    },
+    "raw": "2026-05-03 12:25:01.927 Df sudo[29094:ef22cb] patricksmith : 2 incorrect password attempts ; TTY=ttys006 ; PWD=/Users/patricksmith/Documents/GitHub/mini-siem ; USER=root ; ENV=TERMINFO=/Applications/kitty.app/Contents/Resources/kitty/terminfo ; COMMAND=fakeuser@localhost",
+    "event_id": "6d735934-e384-45c8-9433-377a590f38e1"
   }
 ]

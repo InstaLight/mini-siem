@@ -29,6 +29,14 @@ PAM_SUDO_AUTH_FAILURE = re.compile(
     r"pam_unix\(sudo:auth\):\s*authentication failure[^\n]*\buser=(?P<user>\S+)",
     re.I,
 )
+GENERIC_AUTH_FAILURE_USER = re.compile(
+    r"(authentication failure|failed authentication|incorrect password)[^\n]*\buser(?:name)?[=:\s]+(?P<user>[\w.-]+)",
+    re.I,
+)
+GENERIC_AUTH_FAILURE = re.compile(
+    r"(authentication failure|failed authentication|incorrect password)",
+    re.I,
+)
 
 
 def _iter_log_stream():
@@ -41,7 +49,11 @@ def _iter_log_stream():
         "--predicate",
         'eventMessage CONTAINS "sudo" '
         'OR eventMessage CONTAINS "Failed password" '
-        'OR eventMessage CONTAINS "Accepted "',
+        'OR eventMessage CONTAINS "Accepted " '
+        'OR eventMessage CONTAINS[c] "authentication failure" '
+        'OR eventMessage CONTAINS[c] "failed authentication" '
+        'OR eventMessage CONTAINS[c] "incorrect password" '
+        'OR eventMessage CONTAINS[c] "loginwindow"',
     ]
     try:
         proc = subprocess.Popen(
@@ -167,6 +179,29 @@ def _line_to_events(agent_info: dict, line: str):
                 "service": "sudo",
                 "message": line,
             },
+            raw=line,
+            source="macos_log",
+        )
+        return
+
+    m = GENERIC_AUTH_FAILURE_USER.search(line)
+    if m:
+        yield make_event(
+            agent=agent_info,
+            event_type="authentication_failure",
+            severity="medium",
+            data={"user": m.group("user"), "service": "login", "message": line},
+            raw=line,
+            source="macos_log",
+        )
+        return
+
+    if GENERIC_AUTH_FAILURE.search(line):
+        yield make_event(
+            agent=agent_info,
+            event_type="authentication_failure",
+            severity="medium",
+            data={"service": "login", "message": line},
             raw=line,
             source="macos_log",
         )

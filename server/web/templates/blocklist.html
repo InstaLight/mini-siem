@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Blocklist - Mini-SIEM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Blocklist &amp; quarantine</h1>
+    <p class="page-subtitle">Blocked IPs are dropped at the receiver. Quarantined agents stay connected but every event they send is flagged and auto-escalated.</p>
+  </div>
+</div>
+
+<section class="grid cols-2">
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Blocked IPs</h2>
+      <span class="panel-subtle" id="blocked-count">{{ blocked_ips|length }} IP(s)</span>
+    </div>
+    <form class="row-actions" style="margin-bottom:0.8rem;" onsubmit="addIp(event)">
+      <input type="text" id="new-ip" placeholder="e.g. 203.0.113.9" required pattern="[0-9A-Fa-f\.:]+"/>
+      <input type="text" id="new-ip-reason" placeholder="Reason (optional)"/>
+      <button type="submit" class="primary">Block IP</button>
+    </form>
+    <div class="table-wrap">
+      <table class="table small-table">
+        <thead>
+          <tr>
+            <th>IP</th>
+            <th>Reason</th>
+            <th>Added</th>
+            <th>By</th>
+            <th class="cell-actions"></th>
+          </tr>
+        </thead>
+        <tbody id="blocked-body">
+          {% for item in blocked_ips %}
+          <tr>
+            <td class="mono">{{ item.ip }}</td>
+            <td>{{ item.reason or '-' }}</td>
+            <td>{{ item.added_at or '-' }}</td>
+            <td>{{ item.added_by or '-' }}</td>
+            <td class="cell-actions"><button type="button" onclick="unblockIp('{{ item.ip }}')">Unblock</button></td>
+          </tr>
+          {% endfor %}
+          {% if blocked_ips|length == 0 %}
+          <tr><td colspan="5" class="empty-state">No IPs are currently blocked.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="panel">
+    <div class="panel-header">
+      <h2>Quarantined agents</h2>
+      <span class="panel-subtle" id="quar-count">{{ quarantined_agents|length }} agent(s)</span>
+    </div>
+    <form class="row-actions" style="margin-bottom:0.8rem;" onsubmit="addQuarantine(event)">
+      <input type="text" id="new-agent-id" placeholder="e.g. demo-agent-001" required/>
+      <input type="text" id="new-agent-reason" placeholder="Reason (optional)"/>
+      <button type="submit" class="primary">Quarantine</button>
+    </form>
+    <div class="table-wrap">
+      <table class="table small-table">
+        <thead>
+          <tr>
+            <th>Agent ID</th>
+            <th>Reason</th>
+            <th>Added</th>
+            <th>By</th>
+            <th class="cell-actions"></th>
+          </tr>
+        </thead>
+        <tbody id="quar-body">
+          {% for item in quarantined_agents %}
+          <tr>
+            <td class="mono">{{ item.agent_id }}</td>
+            <td>{{ item.reason or '-' }}</td>
+            <td>{{ item.added_at or '-' }}</td>
+            <td>{{ item.added_by or '-' }}</td>
+            <td class="cell-actions"><button type="button" onclick="releaseAgent('{{ item.agent_id }}')">Release</button></td>
+          </tr>
+          {% endfor %}
+          {% if quarantined_agents|length == 0 %}
+          <tr><td colspan="5" class="empty-state">No agents are currently quarantined.</td></tr>
+          {% endif %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function escapeHtml(s) {
+    return String(s == null ? "" : s)
+      .replace(/&/g, "&amp;")
+      .replace(/</g, "&lt;")
+      .replace(/>/g, "&gt;")
+      .replace(/"/g, "&quot;")
+      .replace(/'/g, "&#39;");
+  }
+  function escapeJs(s) {
+    return String(s || "").replace(/'/g, "\\'");
+  }
+
+  function renderBlocked(rows) {
+    document.getElementById("blocked-count").textContent = `${rows.length} IP(s)`;
+    const body = document.getElementById("blocked-body");
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="5" class="empty-state">No IPs are currently blocked.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map((r) => `
+      <tr>
+        <td class="mono">${escapeHtml(r.ip)}</td>
+        <td>${escapeHtml(r.reason || '-')}</td>
+        <td>${escapeHtml(r.added_at || '-')}</td>
+        <td>${escapeHtml(r.added_by || '-')}</td>
+        <td class="cell-actions"><button type="button" onclick="unblockIp('${escapeJs(r.ip)}')">Unblock</button></td>
+      </tr>
+    `).join("");
+  }
+
+  function renderQuar(rows) {
+    document.getElementById("quar-count").textContent = `${rows.length} agent(s)`;
+    const body = document.getElementById("quar-body");
+    if (!rows.length) {
+      body.innerHTML = '<tr><td colspan="5" class="empty-state">No agents are currently quarantined.</td></tr>';
+      return;
+    }
+    body.innerHTML = rows.map((r) => `
+      <tr>
+        <td class="mono">${escapeHtml(r.agent_id)}</td>
+        <td>${escapeHtml(r.reason || '-')}</td>
+        <td>${escapeHtml(r.added_at || '-')}</td>
+        <td>${escapeHtml(r.added_by || '-')}</td>
+        <td class="cell-actions"><button type="button" onclick="releaseAgent('${escapeJs(r.agent_id)}')">Release</button></td>
+      </tr>
+    `).join("");
+  }
+
+  async function refresh() {
+    const data = await SIEM.getJson("/api/blocklist");
+    renderBlocked(data.blocked_ips || []);
+    renderQuar(data.quarantined_agents || []);
+  }
+
+  async function addIp(event) {
+    event.preventDefault();
+    const ip = document.getElementById("new-ip").value.trim();
+    const reason = document.getElementById("new-ip-reason").value.trim();
+    if (!ip) return;
+    try {
+      await SIEM.postJson("/api/blocklist", { ip, reason, requested_by: "blocklist-page" });
+      SIEM.showToast(`Blocked ${ip}.`, "ok");
+      document.getElementById("new-ip").value = "";
+      document.getElementById("new-ip-reason").value = "";
+      refresh();
+    } catch (e) {
+      SIEM.showToast(`Failed to block: ${e.message}`, "err");
+    }
+  }
+
+  async function unblockIp(ip) {
+    const ok = await SIEM.confirmToast(`Unblock ${ip}?`, { confirmLabel: "Unblock" });
+    if (!ok) return;
+    await SIEM.deleteJson(`/api/blocklist/${encodeURIComponent(ip)}?requested_by=blocklist-page`);
+    SIEM.showToast(`${ip} unblocked.`, "ok");
+    refresh();
+  }
+
+  async function addQuarantine(event) {
+    event.preventDefault();
+    const agentId = document.getElementById("new-agent-id").value.trim();
+    const reason = document.getElementById("new-agent-reason").value.trim();
+    if (!agentId) return;
+    try {
+      await SIEM.postJson("/api/quarantine", { agent_id: agentId, reason, requested_by: "blocklist-page" });
+      SIEM.showToast(`Agent ${agentId} quarantined.`, "ok");
+      document.getElementById("new-agent-id").value = "";
+      document.getElementById("new-agent-reason").value = "";
+      refresh();
+    } catch (e) {
+      SIEM.showToast(`Failed: ${e.message}`, "err");
+    }
+  }
+
+  async function releaseAgent(agentId) {
+    const ok = await SIEM.confirmToast(`Release ${agentId} from quarantine?`, { confirmLabel: "Release" });
+    if (!ok) return;
+    await SIEM.deleteJson(`/api/quarantine/${encodeURIComponent(agentId)}?requested_by=blocklist-page`);
+    SIEM.showToast(`Agent ${agentId} released.`, "ok");
+    refresh();
+  }
+
+  SIEM.poll("/api/blocklist", 7000, (data) => {
+    renderBlocked(data.blocked_ips || []);
+    renderQuar(data.quarantined_agents || []);
+    SIEM.updateLive("live");
+  });
+</script>
+{% endblock %}

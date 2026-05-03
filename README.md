@@ -153,15 +153,33 @@ Optional extra keys (e.g. `command` for sudo) are allowed. Use `make_event()` so
 
 ## Real dashboard features
 
-The dashboard at `/` now includes:
+The dashboard at [http://localhost:8000/](http://localhost:8000/) is a server-rendered Jinja2 UI with vanilla-JS live polling (5-10s). Every control is wired to a real endpoint - no placeholders.
 
-- A summary-first layout for non-technical audiences
-- Plain-language warnings/activity labels
-- Alerts + events views with bulk checkbox selection
-- **Clear selected** for alerts and events independently
-- Combined CSV export (`/export/combined.csv`)
-- Response action controls (with dry-run enabled by default)
-- Action audit history panel
+Top-level pages:
+
+- **Overview (`/`)** - summary cards, severity donut, activity-over-time timeline, latest warnings & activity previews, agents mini-table. Auto-refreshes live.
+- **Warnings (`/warnings`)** - filterable table (free-text search, user, source IP, type, time window, severity chips), bulk clear, bulk response actions, per-tab CSV. Click a row to drill into `/warnings/{alert_id}`.
+- **Warning detail (`/warnings/{alert_id}`)** - full fields, related activity (same user / IP / agent), and one-click response buttons (Block IP, Isolate Host, Clear, or any other allowed action with a reason).
+- **Activity (`/activity`)** - same pattern for raw events + `/activity/{event_id}` detail.
+- **Agents (`/agents`)** - derived from the event stream (last seen, event count, OS, IP). Isolate / release buttons per agent.
+- **Responses (`/responses`)** - full audit history of every response action (filters by status/type, expandable per-row JSON, CSV export).
+- **Blocklist (`/blocklist`)** - manage blocked IPs + quarantined agents: add, remove, view reason & added-by.
+
+Legacy URLs `/health`, `/issues`, `/actions`, `/admin` redirect to the new pages so old links keep working.
+
+## Real response actions
+
+`ALLOWED_ACTIONS`:
+
+| Action | What actually happens |
+|--------|----------------------|
+| `block_ip` | Writes the IP to `server/storage/blocklist.json`. The TCP receiver drops all future events whose `data.src_ip` matches. |
+| `unblock_ip` | Removes the IP from the blocklist (receiver resumes accepting its events). |
+| `isolate_host` | Writes the agent id to `server/storage/quarantine.json`. The receiver still accepts the agent's events but flags them with `quarantined: true` AND raises a new `quarantined_host_activity` high-severity warning for each one. |
+| `release_quarantine` | Removes the agent from quarantine (events stop being flagged/escalated). |
+| `terminate_process` | Local `kill -9` against any numeric PIDs in `target_ids` (MVP; same behavior as before). |
+
+Every action call stores a record in `server/storage/actions.json` with the requester, targets, status, dry-run flag, reason, and full details payload.
 
 ## Demo data seeding
 
@@ -186,16 +204,16 @@ This generates varied event types to trigger multiple detectors:
 - repeated privilege escalation (sudo abuse),
 - incorrect password samples.
 
-## Response action safety model (MVP)
+## Response action safety model
 
-- Allowed action types are explicitly allowlisted (`terminate_process`, `isolate_host`).
-- Destructive actions default to `dry_run=true`.
-- Every action request is recorded with:
+- Allowed action types are explicitly allowlisted (see the table above).
+- The API accepts a `dry_run` flag; the new UI defaults to `dry_run=false` so demo actions are real, but the field is still honored for scripted calls.
+- Every action request is recorded in `server/storage/actions.json` with:
   - action ID, requester, timestamps
-  - targeted IDs
-  - status + execution details
-- `terminate_process` currently executes only on the local server host (PID-based MVP path).
-- `isolate_host` is a placeholder response for future remote agent integration.
+  - targeted IDs + resolved src_ips / agent ids
+  - status + full execution details
+- `terminate_process` executes only on the local server host (PID-based MVP path).
+- `isolate_host` and `block_ip` are enforced inside the TCP receiver (see `server/response/enforcement.py`).
 
 ## OS-login startup automation
 
@@ -216,16 +234,34 @@ Environment overrides (optional):
 - `PYTHON_BIN` (default: `./venv/bin/python3`)
 - `CONFIG_PATH` (default: `./agent/config.json`)
 
-## API additions (final version)
+## HTTP API surface
 
-- `GET /events` - returns enriched events (includes `event_id`)
-- `GET /alerts` - returns enriched alerts (includes `alert_id`)
-- `POST /events/clear-selected` - bulk clear selected events by `ids`
-- `POST /alerts/clear-selected` - bulk clear selected alerts by `ids`
-- `GET /export/combined.csv` - combined event+alert CSV download
-- `GET /actions` - response action audit records
-- `GET /actions/candidates` - actionable records + allowed action types
-- `POST /actions/execute` - trigger guarded response action
+JSON API used by the UI polling layer (5-10s intervals) and by any external script:
+
+| Method / Path | Purpose |
+|---------------|---------|
+| `GET  /api/summary` | Totals, severity counts, connected agents, blocklist/quarantine sizes |
+| `GET  /api/alerts?q=&severity=&user=&ip=&type=&since=&limit=` | Filterable warnings list |
+| `GET  /api/alerts/{alert_id}` | Warning + related events |
+| `GET  /api/events?...` | Filterable activity list (same query params) |
+| `GET  /api/events/{event_id}` | Event + related events |
+| `GET  /api/agents` | Agents derived from the event stream |
+| `GET  /api/timeseries?window=60m&bucket=5m` | Activity-over-time buckets |
+| `GET  /api/severity-breakdown` | Severity counts for the donut chart |
+| `GET  /api/blocklist` | Blocked IPs + quarantined agents |
+| `POST /api/blocklist` | Add a blocked IP `{ip, reason?, requested_by?}` |
+| `DELETE /api/blocklist/{ip}` | Unblock an IP |
+| `POST /api/quarantine` | Quarantine an agent `{agent_id, reason?, requested_by?}` |
+| `DELETE /api/quarantine/{agent_id}` | Release an agent |
+| `GET  /api/actions?limit=` | Action history (newest first) |
+| `GET  /api/actions/candidates` | Allowed action types + alert/event candidates |
+| `POST /api/actions/execute` | Run any allowed action |
+| `POST /api/alerts/clear-selected` | Bulk clear `{ids: [...]}` |
+| `POST /api/events/clear-selected` | Bulk clear `{ids: [...]}` |
+
+Legacy-compatible endpoints (same contracts as before): `GET /events`, `GET /alerts`, `GET /actions/candidates`, `POST /actions/execute`, `POST /alerts/clear-selected`, `POST /events/clear-selected`, `POST /alerts/clear`.
+
+CSV exports: `/export/combined.csv`, `/export/alerts.csv`, `/export/events.csv`, `/export/actions.csv`.
 
 ## Final demo runbook
 
@@ -234,14 +270,13 @@ Environment overrides (optional):
 3. Seed demonstration data: `make seed-demo`
 4. Open dashboard: [http://localhost:8000](http://localhost:8000)
 5. Walk non-technical viewers through:
-   - top summary cards (overall activity and risk),
-   - **Warnings** tab (human-readable warning list),
-   - **Activity Log** tab (underlying event stream),
-   - **Response History** (what response steps were run).
-6. Verify interactive features:
-   - select rows and run **clear selected** in each tab,
-   - export CSV and inspect both `record_kind=event` and `record_kind=alert` rows,
-   - execute a dry-run response action and confirm it appears in action history.
+   - **Overview** - summary cards + severity donut + activity timeline.
+   - **Warnings** - filter by severity/time, click a row to open the warning detail.
+   - From a warning detail, click **Block IP** and **Isolate host**; watch them land in `/blocklist` and `/responses` live.
+   - **Activity** - same pattern for raw events.
+   - **Agents** - isolate/release a host with one click.
+   - **Responses** - full audit trail with expandable JSON details.
+6. Re-run `make seed-demo` after blocking the demo IP (`203.0.113.9`) to demonstrate that blocked events never land in the activity list.
 
 ## License / status
 

@@ -149,5 +149,214 @@
     "details": {
       "result": "Placeholder: host isolation agent integration pending"
     }
+  },
+  {
+    "action_id": "61ebd22d-4e9a-45fe-a5f1-3c286d7f7c44",
+    "action_type": "isolate_host",
+    "requested_by": "admin-page",
+    "target_ids": [
+      "b12b3156-cba2-4579-8516-3251bb19feb6"
+    ],
+    "dry_run": false,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:48:27.921361Z",
+    "completed_at": "2026-04-29T17:48:27.921399Z",
+    "details": {
+      "result": "Placeholder: host isolation agent integration pending"
+    }
+  },
+  {
+    "action_id": "2b64eb35-1a3d-4288-813b-6794e5e2037b",
+    "action_type": "isolate_host",
+    "requested_by": "admin-page",
+    "target_ids": [
+      "b12b3156-cba2-4579-8516-3251bb19feb6",
+      "7e0b3343-21c3-4a58-8ba2-cdf441d175df",
+      "05902fe5-ee32-4f4d-b47a-fb86d8b1ed95",
+      "c6ff7003-268b-472d-bad1-acff7c0e4ff9",
+      "2c5fd982-1baf-4514-a4a3-8bdefe192648",
+      "7ece3771-7411-43da-bc54-70442023c881",
+      "b4d658b6-0ad9-48d1-9f31-7f0505f2e9ba",
+      "49e97077-5c53-454f-98ba-604fcfa050d9",
+      "0caba7db-4e36-4ece-b7dd-3e10a49acabf",
+      "72a13380-802c-4773-b572-909373f3f1e7",
+      "61a48abb-c7b1-4e79-a23b-afdefd9b4310",
+      "e8efd495-5519-4154-95ed-c2ac2fea57da",
+      "d7ce20ae-a938-4f86-bd15-b9b38ceef9eb",
+      "52368042-e372-4b2e-b795-69fcd2ac6fd0",
+      "25aeac25-d19d-434f-8484-e3b10ec8a6bf",
+      "425c731a-a3b7-4ce5-b1f0-2c996d5a1e82",
+      "b7b5172d-a6be-4fb8-95c5-39a8466dca1c",
+      "f4d7a306-72af-4ba4-ad0e-318483339012",
+      "de14b989-fc75-47e9-bebc-d14d7971b2e4",
+      "f298a19f-a527-4159-a149-aa1af38d2d05",
+      "d9e642a0-3765-4739-8f1f-c9c8d60e5ef3",
+      "687a888e-2310-4e94-92be-a50df910cb32",
+      "653e50a8-fe0d-40b5-9e2f-bcb9ceb5e197",
+      "299c135a-4509-4a02-b1fe-4798e0cb41cf"
+    ],
+    "dry_run": false,
+    "status": "completed",
+    "requested_at": "2026-04-29T17:48:32.046119Z",
+    "completed_at": "2026-04-29T17:48:32.046153Z",
+    "details": {
+      "result": "Placeholder: host isolation agent integration pending"
+    }
+  },
+  {
+    "action_id": "7e0b651b-a9a2-4965-8b61-d67b8b2116c7",
+    "action_type": "block_ip",
+    "requested_by": "smoke",
+    "target_ids": [],
+    "dry_run": false,
+    "reason": "smoke test",
+    "status": "completed",
+    "requested_at": "2026-05-03T16:12:40.615899Z",
+    "completed_at": "2026-05-03T16:12:40.616823Z",
+    "details": {
+      "blocked": [
+        {
+          "ip": "198.51.100.55",
+          "reason": "smoke test",
+          "added_at": "2026-05-03T16:12:40.616223Z",
+          "added_by": "smoke"
+        }
+      ]
+    }
+  },
+  {
+    "action_id": "3aa12ace-202e-4d08-b01e-22273e864a5f",
+    "action_type": "unblock_ip",
+    "requested_by": "smoke",
+    "target_ids": [],
+    "dry_run": false,
+    "reason": "",
+    "status": "completed",
+    "requested_at": "2026-05-03T16:12:40.620669Z",
+    "completed_at": "2026-05-03T16:12:40.620877Z",
+    "details": {
+      "unblocked": [
+        "198.51.100.55"
+      ]
+    }
+  },
+  {
+    "action_id": "9976f4ab-92c8-486b-9479-6de5cc5a9aab",
+    "action_type": "isolate_host",
+    "requested_by": "smoke",
+    "target_ids": [],
+    "dry_run": false,
+    "reason": "smoke",
+    "status": "completed",
+    "requested_at": "2026-05-03T16:12:40.622580Z",
+    "completed_at": "2026-05-03T16:12:40.623095Z",
+    "details": {
+      "quarantined": [
+        {
+          "agent_id": "demo-agent-001",
+          "reason": "smoke",
+          "added_at": "2026-05-03T16:12:40.622626Z",
+          "added_by": "smoke"
+        }
+      ]
+    }
+  },
+  {
+    "action_id": "51ab7fa3-494a-4438-b722-a586f2126397",
+    "action_type": "release_quarantine",
+    "requested_by": "smoke",
+    "target_ids": [],
+    "dry_run": false,
+    "reason": "",
+    "status": "completed",
+    "requested_at": "2026-05-03T16:12:40.624923Z",
+    "completed_at": "2026-05-03T16:12:40.625149Z",
+    "details": {
+      "released": [
+        "demo-agent-001"
+      ]
+    }
+  },
+  {
+    "action_id": "3e596cc9-6322-40ec-816b-f3b002e159b6",
+    "action_type": "block_ip",
+    "requested_by": "smoke",
+    "target_ids": [
+      "b12b3156-cba2-4579-8516-3251bb19feb6"
+    ],
+    "dry_run": false,
+    "reason": "",
+    "status": "completed",
+    "requested_at": "2026-05-03T16:12:40.628257Z",
+    "completed_at": "2026-05-03T16:12:40.628526Z",
+    "details": {
+      "blocked": [
+        {
+          "ip": "203.0.113.9",
+          "reason": "blocked via smoke",
+          "added_at": "2026-05-03T16:12:40.628398Z",
+          "added_by": "smoke"
+        }
+      ]
+    }
+  },
+  {
+    "action_id": "ee76e303-0ca7-4f1b-bdc0-83cbcd6773d3",
+    "action_type": "unblock_ip",
+    "requested_by": "smoke",
+    "target_ids": [
+      "b12b3156-cba2-4579-8516-3251bb19feb6"
+    ],
+    "dry_run": false,
+    "reason": "",
+    "status": "completed",
+    "requested_at": "2026-05-03T16:12:40.630338Z",
+    "completed_at": "2026-05-03T16:12:40.630658Z",
+    "details": {
+      "unblocked": [
+        "203.0.113.9"
+      ]
+    }
+  },
+  {
+    "action_id": "4a698765-f501-4d6b-b3b6-a8eacd5ec904",
+    "action_type": "isolate_host",
+    "requested_by": "smoke",
+    "target_ids": [
+      "b12b3156-cba2-4579-8516-3251bb19feb6"
+    ],
+    "dry_run": false,
+    "reason": "",
+    "status": "completed",
+    "requested_at": "2026-05-03T16:12:40.632164Z",
+    "completed_at": "2026-05-03T16:12:40.632421Z",
+    "details": {
+      "quarantined": [
+        {
+          "agent_id": "demo-agent-001",
+          "reason": "isolated via smoke",
+          "added_at": "2026-05-03T16:12:40.632290Z",
+          "added_by": "smoke"
+        }
+      ]
+    }
+  },
+  {
+    "action_id": "fa954d26-8d24-42c4-b23d-4e51e4394cba",
+    "action_type": "release_quarantine",
+    "requested_by": "smoke",
+    "target_ids": [
+      "b12b3156-cba2-4579-8516-3251bb19feb6"
+    ],
+    "dry_run": false,
+    "reason": "",
+    "status": "completed",
+    "requested_at": "2026-05-03T16:12:40.633946Z",
+    "completed_at": "2026-05-03T16:12:40.634193Z",
+    "details": {
+      "released": [
+        "demo-agent-001"
+      ]
+    }
   }
 ]

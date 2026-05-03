@@ -1,0 +1,145 @@
+{% extends "base.html" %}
+
+{% block title %}Warnings - Mini-SIEM{% endblock %}
+
+{% block content %}
+<div class="page-header">
+  <div>
+    <h1>Warnings</h1>
+    <p class="page-subtitle">Security warnings raised by detection rules. Click a row to investigate and respond.</p>
+  </div>
+  <div class="row-actions">
+    <a class="btn" href="/export/alerts.csv">Export Warnings CSV</a>
+    <a class="btn" href="/export/combined.csv">Export Combined CSV</a>
+  </div>
+</div>
+
+<form class="filter-bar" method="get" action="/warnings" id="filter-form">
+  <div class="row">
+    <input type="search" name="q" placeholder="Search user, IP, type, message..." value="{{ filters_view.q }}"/>
+    <input type="text" name="user" placeholder="User" value="{{ filters_view.user }}"/>
+    <input type="text" name="ip" placeholder="Source IP" value="{{ filters_view.ip }}"/>
+    <select name="type">
+      <option value="">Any type</option>
+      {% for t in alert_types %}
+      <option value="{{ t }}" {% if filters_view.type == t %}selected{% endif %}>{{ t|replace('_', ' ')|title }}</option>
+      {% endfor %}
+    </select>
+    <select name="since">
+      {% set windows = [("all","All time"),("15m","Last 15 min"),("1h","Last hour"),("24h","Last 24 hours"),("7d","Last 7 days")] %}
+      {% for val, label in windows %}
+      <option value="{{ val }}" {% if filters_view.since == val %}selected{% endif %}>{{ label }}</option>
+      {% endfor %}
+    </select>
+  </div>
+  <div class="row">
+    <span class="muted">Severity:</span>
+    <div class="chip-group">
+      {% for sev in ["high", "medium", "low"] %}
+      <label class="chip-toggle sev-{{ sev }} {% if sev in filters_view.severity %}active{% endif %}">
+        <input type="checkbox" name="severity" value="{{ sev }}" {% if sev in filters_view.severity %}checked{% endif %} onchange="document.getElementById('filter-form').submit()"/>
+        <span>{{ sev|title }}</span>
+      </label>
+      {% endfor %}
+    </div>
+    <span class="spacer" style="flex:1;"></span>
+    <button type="submit" class="primary">Apply</button>
+    <a class="btn" href="/warnings">Reset</a>
+  </div>
+</form>
+
+<div class="toolbar">
+  <button type="button" onclick="selectAll(true)">Select all</button>
+  <button type="button" onclick="selectAll(false)">Clear selection</button>
+  <button type="button" class="danger" onclick="clearSelectedWarnings()">Clear selected</button>
+  <span class="counter"><span id="selected-count">0</span> selected &middot; {{ alerts|length }} shown / {{ total_alerts }} total</span>
+  <span class="spacer"></span>
+  <select id="bulk-action-type">
+    {% for action in allowed_actions %}
+    <option value="{{ action }}">{{ action|replace('_', ' ')|title }}</option>
+    {% endfor %}
+  </select>
+  <button type="button" class="primary" onclick="runBulkAction()">Run action</button>
+</div>
+
+<div class="table-wrap">
+  <table class="table">
+    <thead>
+      <tr>
+        <th style="width:30px;"><input type="checkbox" onclick="selectAll(this.checked)" aria-label="Select all"/></th>
+        <th>Severity</th>
+        <th>Warning</th>
+        <th>User</th>
+        <th>Source IP</th>
+        <th>Agent</th>
+        <th>When</th>
+        <th class="cell-actions">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for alert in alerts %}
+      <tr>
+        <td><input type="checkbox" class="row-check" value="{{ alert.alert_id }}" onchange="updateSelected()"/></td>
+        <td><span class="chip sev-{{ alert.severity|default('low')|lower }}"><span class="dot"></span>{{ alert.severity|default('low')|title }}</span></td>
+        <td>
+          <a href="/warnings/{{ alert.alert_id }}">{{ alert.alert_type|default('warning')|replace('_', ' ')|title }}</a>
+          <div class="muted" style="font-size: 0.82rem;">{{ alert.message or '' }}</div>
+        </td>
+        <td>{{ alert.username or '-' }}</td>
+        <td class="mono">{{ alert.src_ip or '-' }}</td>
+        <td class="mono">{{ alert.client_id or '-' }}</td>
+        <td>{{ alert.timestamp or '-' }}</td>
+        <td class="cell-actions">
+          <div class="row-actions">
+            <a class="btn" href="/warnings/{{ alert.alert_id }}">Inspect</a>
+            {% if alert.src_ip %}
+            <button type="button" class="danger" onclick="blockOne('{{ alert.alert_id }}')">Block IP</button>
+            {% endif %}
+          </div>
+        </td>
+      </tr>
+      {% endfor %}
+      {% if alerts|length == 0 %}
+      <tr><td colspan="8" class="empty-state">No warnings match the current filters.</td></tr>
+      {% endif %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  function updateSelected() {
+    document.getElementById("selected-count").textContent = SIEM.selectedIds(".row-check").length;
+  }
+  function selectAll(checked) {
+    SIEM.toggleAll(".row-check", checked);
+    updateSelected();
+  }
+
+  async function clearSelectedWarnings() {
+    const ids = SIEM.selectedIds(".row-check");
+    if (!ids.length) return SIEM.showToast("Select at least one warning first.", "err");
+    const ok = await SIEM.confirmToast(`Remove ${ids.length} warning(s) from the list?`, { danger: true, confirmLabel: "Clear" });
+    if (!ok) return;
+    const res = await SIEM.postJson("/api/alerts/clear-selected", { ids });
+    SIEM.showToast(`Cleared ${res.removed} warning(s).`, "ok");
+    setTimeout(() => window.location.reload(), 400);
+  }
+
+  async function runBulkAction() {
+    const ids = SIEM.selectedIds(".row-check");
+    if (!ids.length) return SIEM.showToast("Select at least one warning first.", "err");
+    const actionType = document.getElementById("bulk-action-type").value;
+    const result = await SIEM.executeAction(actionType, ids, { confirmText: `Run '${SIEM.titleCase(actionType)}' on ${ids.length} warning(s)?` });
+    if (result) setTimeout(() => window.location.reload(), 500);
+  }
+
+  async function blockOne(id) {
+    const result = await SIEM.executeAction("block_ip", [id], { confirmText: "Block this warning's source IP?" });
+    if (result) setTimeout(() => window.location.reload(), 500);
+  }
+
+  SIEM.poll("/api/summary", 10000, () => SIEM.updateLive("live"));
+</script>
+{% endblock %}

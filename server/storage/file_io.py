@@ -14,11 +14,15 @@ _STORAGE_DIR = os.path.dirname(os.path.abspath(__file__))
 EVENTS_FILE = os.path.join(_STORAGE_DIR, "events.json")
 ALERTS_FILE = os.path.join(_STORAGE_DIR, "alerts.json")
 ACTIONS_FILE = os.path.join(_STORAGE_DIR, "actions.json")
+BLOCKLIST_FILE = os.path.join(_STORAGE_DIR, "blocklist.json")
+QUARANTINE_FILE = os.path.join(_STORAGE_DIR, "quarantine.json")
 
 # Locks for thread-safe append (socket server uses multiple threads)
 events_lock = threading.Lock()
 alerts_lock = threading.Lock()
 actions_lock = threading.Lock()
+blocklist_lock = threading.RLock()
+quarantine_lock = threading.RLock()
 
 
 def load_json_list(path: str) -> list:

@@ -15,6 +15,7 @@ import time
 from agent.config import load_config
 from agent.collector import stream_normalized_events
 from agent.identity import resolve_agent_info
+from shared.event_builder import make_event
 
 
 def parse_args():
@@ -46,6 +47,21 @@ def send_event(sock: socket.socket, event: dict) -> None:
     sock.sendall(msg)
 
 
+def send_heartbeat(sock: socket.socket, agent_info: dict) -> None:
+    heartbeat = make_event(
+        agent=agent_info,
+        event_type="agent_heartbeat",
+        severity="low",
+        data={
+            "service": "agent",
+            "message": "Agent connected and heartbeat sent",
+        },
+        raw="agent connected",
+        source="agent_runtime",
+    )
+    send_event(sock, heartbeat)
+
+
 def main():
     args = parse_args()
     cfg = load_config(args.config)
@@ -58,6 +74,7 @@ def main():
     while True:
         sock = connect_until_ok(host, port, reconnect)
         try:
+            send_heartbeat(sock, agent_info)
             for event in stream_normalized_events(agent_info):
                 send_event(sock, event)
                 print("[+] Sent:", event.get("event", {}).get("type"), file=sys.stderr)
