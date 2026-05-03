@@ -1,6 +1,6 @@
 # Mini-SIEM
 
-A small **SIEM-style** project: OS agents tail authentication logs, send **newline-delimited JSON** over **TCP** to a Python server. The server stores events, runs **pluggable detection rules**, and exposes a **FastAPI** dashboard.
+A small SIEM project: OS agents tail authentication logs, send newline-delimited JSON over TCP to a Python server. The server stores events, runs pluggable detection rules, and exposes a FastAPI dashboard.
 
 ## Setup
 
