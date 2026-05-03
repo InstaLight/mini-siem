@@ -2,36 +2,6 @@
 
 A small **SIEM-style** project: OS agents tail authentication logs, send **newline-delimited JSON** over **TCP** to a Python server. The server stores events, runs **pluggable detection rules**, and exposes a **FastAPI** dashboard.
 
-## Architecture
-
-```
-┌─────────────┐   TCP :9001    ┌──────────────────────────────────┐
-│ Linux/macOS │  JSON + \n     │  server.receiver.socket_server    │
-│ Windows     │ ─────────────► │  validate → store_event            │
-│ agent       │                │  run_detectors → store_alert       │
-└─────────────┘                └───────────────┬──────────────────┘
-                                               │
-                    ┌──────────────────────────┼──────────────────────────┐
-                    ▼                          ▼                          ▼
-             events.json                alerts.json               FastAPI :8000
-             (JSON list)                (JSON list)               dashboard / APIs
-```
-
-- **Envelope** (all platforms): `agent`, `event`, `data`, `raw` — see `shared/event_builder.py`.
-- **Future TLS:** Same messages; wrap the socket with `ssl` without changing JSON.
-
-## Repository layout
-
-| Path | Role |
-|------|------|
-| `shared/schema.py` | Server-side validation (required keys on `agent`, `event`, `data`) |
-| `shared/event_builder.py` | `make_event(...)` — consistent timestamps and `data` shape |
-| `agent/` | Config, CLI, identity, collectors (`linux_auth`, `macos_auth`, `windows_auth`) |
-| `server/receiver/` | TCP listener |
-| `server/detection/` | One module per rule + `registry.py` to register them |
-| `server/storage/` | JSON persistence + file helpers |
-| `server/web/` | FastAPI + Jinja dashboard |
-
 ## Setup
 
 ### 1. Server (any machine reachable by agents)
